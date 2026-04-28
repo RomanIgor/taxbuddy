@@ -1,0 +1,491 @@
+# TAXbuddy — Web Service + PWA Design Spec
+
+**Datum:** 2026-04-26  
+**Status:** Approved  
+**Produkt:** TAXbuddy (ehemals TaxPilot) — KI-Steuer-Assistent für Kleinunternehmer in Deutschland
+
+---
+
+## 1. Kontext & Ausgangslage
+
+### Aktueller Stand
+- Einzelne HTML-Datei (~418 KB), React 19, alles inline gebündelt
+- Komplett offline via `localStorage`
+- Kein Backend, kein Server
+- Mobile-optimiert, aber kein echter PWA-Support
+- KI-Assistent: offline Wissensbasis + optionaler eigener Anthropic API-Key
+
+### Ziel
+Vollständige Umstrukturierung zu einem professionellen Web Service mit:
+- Vite + React + TypeScript Frontend (selbes Design, in Komponenten aufgeteilt)
+- Node.js + Express + TypeScript Backend
+- PostgreSQL Datenbank (EU-Region, DSGVO-konform)
+- Progressive Web App (installierbar, offline-fähig, Push-Benachrichtigungen)
+- Benutzerkonten + Cross-Device-Sync
+- Stripe-Abonnements (Free / Pro)
+- Claude API Proxy mit DSGVO-konformer Pseudonymisierung
+
+---
+
+## 2. Architektur
+
+### Übersicht
+
+```
+[Browser / PWA]
+      │
+      ├─── offline (Service Worker Cache) ──► IndexedDB fallback
+      │
+      └─── online ──► [Express API - EU] ──► [PostgreSQL - EU]
+                            │
+                            ├──► [Anthropic API] (pseudonymisiert)
+                            ├──► [Stripe API] (Abonnements)
+                            └──► [Web Push / VAPID] (Benachrichtigungen)
+```
+
+### Hosting
+| Dienst | Anbieter | Region |
+|--------|----------|--------|
+| Frontend | Vercel | EU Edge |
+| Backend | Railway | EU West (Amsterdam) |
+| PostgreSQL | Railway | EU West (Amsterdam) |
+
+### Monorepo-Struktur
+```
+taxbuddy/
+├── frontend/          # Vite + React + TypeScript
+├── backend/           # Node.js + Express + TypeScript
+├── shared/            # Gemeinsame TypeScript-Typen
+│   └── types.ts       # Expense, Income, Trip, User...
+└── package.json       # Workspace scripts (pnpm workspaces)
+```
+
+---
+
+## 3. Frontend
+
+### Technologie-Stack
+| Tool | Zweck |
+|------|-------|
+| Vite | Build tool |
+| React 19 | UI Framework |
+| TypeScript | Typsicherheit |
+| Zustand | Client-State (UI, offline queue) |
+| React Query | Server-State (API calls, caching) |
+| Workbox | Service Worker, PWA |
+
+### Ordnerstruktur
+```
+frontend/
+├── public/
+│   ├── manifest.json          # PWA Manifest
+│   ├── sw.js                  # Service Worker (Workbox)
+│   └── icons/
+│       ├── icon-192.png
+│       └── icon-512.png
+├── src/
+│   ├── components/
+│   │   ├── onboarding/        # 5-Schritt Onboarding
+│   │   ├── dashboard/         # Dashboard + Quick Actions
+│   │   ├── income/            # Einnahmen Liste + Formular
+│   │   ├── expenses/          # Ausgaben Liste + Detail + Formular
+│   │   ├── trips/             # Fahrtenbuch
+│   │   ├── tips/              # Tipps Liste + Detail (16 Branchen)
+│   │   ├── ai-assistant/      # KI-Chat Interface
+│   │   ├── invoice-check/     # Rechnungs-Check (3 Stages)
+│   │   ├── simulation/        # Umsatz-Slider
+│   │   ├── forecast/          # Jahresprognose
+│   │   ├── export/            # Export Screens (DATEV, Excel, PDF)
+│   │   ├── profile/           # Profil + Einstellungen
+│   │   ├── billing/           # Abonnement-Verwaltung
+│   │   └── ui/                # Wiederverwendbare Komponenten
+│   │       ├── Button.tsx
+│   │       ├── Card.tsx
+│   │       ├── Badge.tsx
+│   │       └── Toast.tsx
+│   ├── hooks/
+│   │   ├── useAuth.ts
+│   │   ├── useOfflineSync.ts
+│   │   └── usePushNotifications.ts
+│   ├── store/
+│   │   └── app.store.ts       # Zustand Store
+│   ├── api/
+│   │   ├── client.ts          # Axios Client + Token Refresh Interceptor
+│   │   ├── income.api.ts
+│   │   ├── expenses.api.ts
+│   │   ├── trips.api.ts
+│   │   ├── export.api.ts
+│   │   ├── ai.api.ts
+│   │   └── billing.api.ts
+│   ├── styles/
+│   │   └── tokens.ts          # Design-Tokens T, C — UNVERÄNDERT
+│   ├── App.tsx
+│   └── main.tsx
+├── index.html
+├── vite.config.ts
+└── tsconfig.json
+```
+
+### PWA Konfiguration
+```json
+// manifest.json
+{
+  "name": "TAXbuddy",
+  "short_name": "TAXbuddy",
+  "theme_color": "#0066B3",
+  "background_color": "#F5F7FA",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512" }
+  ]
+}
+```
+
+### Service Worker Caching Strategien (Workbox)
+| Content | Strategie |
+|---------|-----------|
+| JS, CSS, Fonts | Cache-First |
+| API Daten | Network-First mit Cache-Fallback |
+| Offline Mutationen | Background Sync (IndexedDB Queue) |
+
+---
+
+## 4. Backend
+
+### Technologie-Stack
+| Tool | Zweck |
+|------|-------|
+| Node.js + Express | HTTP Server |
+| TypeScript | Typsicherheit |
+| Prisma | ORM + Migrationen |
+| PostgreSQL | Datenbank (EU) |
+| Zod | Request-Validierung |
+| JWT | Authentifizierung |
+| Anthropic SDK | Claude API Proxy |
+| Stripe SDK | Abonnements + Zahlungen |
+| web-push | VAPID Push-Benachrichtigungen |
+| node-cron | Geplante Push-Trigger |
+
+### Ordnerstruktur
+```
+backend/
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+├── src/
+│   ├── routes/
+│   │   ├── auth.routes.ts
+│   │   ├── income.routes.ts
+│   │   ├── expenses.routes.ts
+│   │   ├── trips.routes.ts
+│   │   ├── export.routes.ts
+│   │   ├── ai.routes.ts
+│   │   ├── push.routes.ts
+│   │   ├── billing.routes.ts
+│   │   └── user.routes.ts
+│   ├── middleware/
+│   │   ├── auth.middleware.ts     # JWT verify
+│   │   ├── subscription.middleware.ts  # Pro-Feature Guard
+│   │   ├── rateLimit.ts           # AI-Endpoint Rate Limiting
+│   │   └── validate.ts            # Zod Middleware
+│   ├── services/
+│   │   ├── ai.service.ts          # Pseudonymisierung + Claude Call
+│   │   ├── export.service.ts      # DATEV CSV, Excel, PDF
+│   │   ├── push.service.ts        # VAPID Web Push
+│   │   └── billing.service.ts     # Stripe Events Handler
+│   ├── lib/
+│   │   ├── prisma.ts
+│   │   └── anthropic.ts
+│   └── server.ts
+├── package.json
+└── tsconfig.json
+```
+
+### API Endpoints
+
+#### Auth
+```
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/refresh
+POST   /api/auth/logout
+```
+
+#### Daten (CRUD)
+```
+GET|POST          /api/income
+GET|PUT|DELETE    /api/income/:id
+
+GET|POST          /api/expenses
+GET|PUT|DELETE    /api/expenses/:id
+
+GET|POST          /api/trips
+GET|PUT|DELETE    /api/trips/:id
+
+POST              /api/export
+GET               /api/export/history
+GET               /api/export/:id
+```
+
+#### KI & Push (Pro)
+```
+POST   /api/ai/chat             # Rate-limited, pseudonymisiert
+POST   /api/push/subscribe
+DELETE /api/push/unsubscribe
+```
+
+#### Abonnements
+```
+POST   /api/billing/checkout    # Stripe Checkout Session erstellen
+POST   /api/billing/portal      # Stripe Customer Portal
+POST   /api/webhooks/stripe     # Stripe Webhook Events
+```
+
+#### DSGVO
+```
+GET    /api/user/me
+PUT    /api/user/me
+GET    /api/user/export         # Alle Daten herunterladen
+DELETE /api/user                # Konto + alle Daten löschen
+```
+
+---
+
+## 5. Datenbank Schema (Prisma)
+
+```prisma
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  passwordHash       String
+  name               String?
+  branch             String?
+  revenueGoal        Float?
+  stripeCustomerId   String?
+  subscriptionStatus String?   // active | canceled | past_due | trialing
+  subscriptionEnd    DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  income             Income[]
+  expenses           Expense[]
+  trips              Trip[]
+  exports            Export[]
+  pushSubscriptions  PushSubscription[]
+}
+
+model Income {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Float
+  client    String
+  category  String
+  status    String   // paid | open
+  date      DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Float
+  vendor      String
+  description String?
+  category    String
+  flag        String   // ok | check | critical
+  paragraph   String?
+  taxImpact   Float?
+  date        DateTime
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Trip {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  client    String
+  contact   String?
+  purpose   String
+  from      String
+  to        String
+  km        Float
+  roundTrip Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Export {
+  id         String   @id @default(cuid())
+  userId     String
+  protocolId String   @unique  // EXP-xxxxx (GoBD)
+  recipient  String
+  email      String?
+  periodFrom DateTime
+  periodTo   DateTime
+  formats    String[]
+  notes      String?
+  stats      Json
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+
+---
+
+## 6. Authentifizierung & Sicherheit
+
+### JWT-Strategie
+- **Access Token:** 15 Minuten, im Speicher (nicht localStorage) — XSS-resistent
+- **Refresh Token:** 30 Tage, httpOnly Cookie (SameSite=Strict) — XSS + CSRF-resistent
+- **Refresh Flow:** Transparent, automatisch via Axios-Interceptor
+- **Logout:** Refresh Token serverseitig invalidieren (Blacklist in DB)
+
+### Weitere Sicherheitsmaßnahmen
+- HTTPS überall (Vercel + Railway)
+- Helmet.js (HTTP Security Headers)
+- CORS: nur eigene Domain erlaubt
+- Rate Limiting: besonders auf `/api/ai/chat` und `/api/auth`
+- Passwort-Hashing: bcrypt (12 rounds)
+- Zod-Validierung auf allen Eingaben
+
+---
+
+## 7. DSGVO / Datenschutz
+
+### Grundsätze
+- Alle Daten in EU gespeichert (Railway EU West — Amsterdam)
+- Keine personenbezogenen Daten in Logs
+- Datenminimierung: nur was nötig wird gespeichert
+
+### Claude API (Anthropic)
+- **Pseudonymisierung im Backend** vor jedem API-Call:
+  - Namen, E-Mails, IBANs werden entfernt
+  - Nur Beträge, Kategorien, Steuerfakten werden gesendet
+- Benutzer stimmt explizit zu, dass anonymisierte Finanzdaten Anthropic erreichen
+- DPA (Auftragsverarbeitungsvertrag) mit Anthropic abschließen
+
+### Stripe
+- Stripe ist DSGVO-konform, verarbeitet keine Daten auf unserem Server
+- Wir speichern nur: `stripeCustomerId`, `subscriptionStatus`, `subscriptionEnd`
+- Kein Kartendaten-Kontakt auf unserem Server
+
+### Pflichtdokumente
+- [ ] Datenschutzerklärung (Anthropic + Stripe als Sub-Processors nennen)
+- [ ] Impressum
+- [ ] AV-Vertrag mit Anthropic
+- [ ] Cookie-Hinweis (falls Analytics hinzukommen)
+
+### Nutzerrechte (implementiert)
+- `GET /api/user/export` — Auskunftsrecht (Art. 15 DSGVO)
+- `DELETE /api/user` — Löschrecht (Art. 17 DSGVO)
+
+---
+
+## 8. Abonnements (Stripe)
+
+### Tiers
+| Feature | Free | Pro |
+|---------|------|-----|
+| Offline-Modus | ✓ | ✓ |
+| Daten lokal (kein Sync) | ✓ | ✓ |
+| Cross-Device Sync | — | ✓ |
+| KI-Assistent (Server-Proxy) | — | ✓ |
+| Push-Benachrichtigungen | — | ✓ |
+| Export DATEV/PDF | — | ✓ |
+| Eigener Anthropic API-Key | ✓ | ✓ |
+
+### Zahlungsmethoden (Stripe)
+- Kreditkarte
+- SEPA-Lastschrift (wichtig für Deutschland)
+- SOFORT / Klarna
+
+### Webhook Events (kritisch)
+```
+customer.subscription.created   → Status aktivieren
+customer.subscription.deleted   → Status deaktivieren
+invoice.payment_failed           → Status auf past_due
+invoice.payment_succeeded        → Status zurücksetzen
+```
+
+---
+
+## 9. Offline Sync
+
+### Strategie
+1. Benutzer macht Änderung offline → sofort in IndexedDB Queue gespeichert
+2. UI wird optimistisch aktualisiert (sofortiges Feedback)
+3. Service Worker erkennt Verbindung wieder
+4. Background Sync sendet Queue an Backend
+5. Bei Konflikt → UI benachrichtigt Benutzer
+
+### Cache-Invalidierung
+- React Query: `staleTime: 5 Minuten`, `gcTime: 24 Stunden`
+- Bei Background Sync: Query-Cache invalidieren
+
+---
+
+## 10. Push-Benachrichtigungen (TAXbuddy-spezifisch)
+
+### Automatische Trigger (node-cron, Backend)
+| Ereignis | Nachricht |
+|----------|-----------|
+| 10. des Monats | "Vorauszahlung fällig!" |
+| 31. Mai | "Steuererklärung Frist!" |
+| 80% der KU-Grenze erreicht | "Achtung: 80% Umsatzgrenze erreicht" |
+| 95% der KU-Grenze | "Kritisch: Kleinunternehmergrenze fast erreicht!" |
+
+---
+
+## 11. Error Handling
+
+### Frontend
+- React Error Boundary → Fallback UI bei Render-Fehlern
+- React Query → automatischer Retry (3x) + stale-while-revalidate
+- Offline-Banner wenn Verbindung fehlt
+- Toast-Notifications → Fehlermeldungen auf Deutsch
+
+### Backend
+- Zod-Fehler → 400 mit klarer Feldangabe
+- JWT ungültig → 401
+- Pro-Feature ohne Abo → 403
+- Rate Limit überschritten → 429 mit Retry-After
+- Server-Fehler → 500 mit Error-ID (geloggt, nicht exponiert)
+- Globale Error-Middleware — kein uncaught error
+
+---
+
+## 12. Vollständiger Tech-Stack
+
+| Layer | Technologie |
+|-------|-------------|
+| Frontend Build | Vite |
+| Frontend UI | React 19 + TypeScript |
+| Client State | Zustand |
+| Server State | React Query |
+| Backend | Node.js + Express + TypeScript |
+| Validierung | Zod (frontend + backend) |
+| ORM | Prisma |
+| Datenbank | PostgreSQL (Railway EU) |
+| Auth | JWT (Access im Speicher + Refresh httpOnly) |
+| AI Proxy | Anthropic SDK + DSGVO-Pseudonymisierung |
+| Zahlungen | Stripe (SEPA, Kreditkarte, SOFORT) |
+| PWA | Workbox + Web App Manifest + VAPID |
+| Offline | IndexedDB + Background Sync |
+| Push | web-push (VAPID) |
+| Cron | node-cron |
+| Hosting FE | Vercel (EU Edge) |
+| Hosting BE+DB | Railway (EU West — Amsterdam) |

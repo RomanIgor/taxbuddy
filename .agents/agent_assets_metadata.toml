@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "hfSkbrr0UjV6NWNrvKGGq"
+uri = "file://artifacts/taxbuddy/assets/images/icon.png"
+type = "image"
+title = "generated_image"

@@ -1,0 +1,205 @@
+# TaxPilot v3 – Komplette App
+
+**Dein KI-gestützter Steuer-Assistent für Kleinunternehmer & Selbstständige in Deutschland**
+
+Stand: April 2026 · Alle Gesetze auf Stand 2025/2026
+
+---
+
+## 📦 Was ist enthalten
+
+| Datei | Zweck |
+|-------|-------|
+| `taxpilot-demo.html` | **Fertige, lauffähige App** (offline) – einfach im Browser öffnen |
+| `taxpilot-v3-complete.jsx` | **Quellcode** der React-App (ca. 7.000 Zeilen) |
+| `README.md` | Diese Datei |
+| `FEATURES.md` | Komplette Feature-Übersicht |
+
+---
+
+## 🚀 Schnellstart
+
+**Einfach `taxpilot-demo.html` im Browser öffnen.**
+
+- Funktioniert in Safari, Chrome, Firefox, Edge
+- Mobile-optimiert für iPhone & Android
+- **Komplett offline nutzbar** (alle Bibliotheken sind integriert)
+- Keine Installation nötig
+- Keine Registrierung nötig
+
+**Hinweis:** Beim ersten Öffnen durchläufst du das Onboarding (Name, Branche, Umsatzziel). Danach startet die App direkt im Dashboard.
+
+---
+
+## ✨ Kernfunktionen
+
+### 🏠 Dashboard
+- Status-Hero mit aktuellem Umsatz & Grenze-Prozent
+- Prognose zum Jahresende (Ampel-System)
+- 8 Quick-Actions für häufige Aktionen
+- Fahrtenbuch-Stat-Karte
+
+### 💰 Einnahmen
+- Erfassen mit Kategorien (Beratung, Entwicklung, etc.)
+- Status bezahlt / offen
+- Live-Aktualisierung des Dashboards
+
+### 🧾 Ausgaben
+- Erfassen mit 8 Kategorien (Hardware, Software, Reisen, Bewirtung, etc.)
+- **Auto-Enrichment**: App fügt § + Steuerwirkung + Risiko automatisch hinzu
+- Klickbare Detail-Ansicht mit 6 Sektionen
+- Filter: OK / Prüfen / Kritisch
+
+### 🚗 Fahrtenbuch
+- km-Pauschale × 0,30 € live-Berechnung
+- Hin-/Rückfahrt-Toggle
+- Alle Pflichtfelder (Datum, Kunde, Zweck, Start, Ziel)
+- Fahrten fließen automatisch in Dashboard-Berechnung
+
+### 💡 Tipps
+- 20+ ausführliche Steuer-Spar-Tipps
+- Detail-Seite pro Tipp mit:
+  - Was bedeutet das?
+  - Rechenbeispiel
+  - Was beachten?
+  - FA-Risiken
+  - Grauzonen
+  - Rechtliche Grundlage (§§)
+- **Branchenspezifisch**: 16 Branchen unterstützt
+
+### 🤖 KI-Steuer-Assistent
+**2 Modi:**
+
+1. **Offline-Modus** (Standard)
+   - 35+ Fakten zu allen Steuerthemen 2025/2026
+   - 39+ Experten-Antworten mit Rechenbeispielen
+   - Paragraphen-Verweise
+   - Personalisiert mit deinen Daten
+
+2. **API-Modus** (optional, mit eigenem Anthropic-Key)
+   - Echte Claude Sonnet 4.5-Antworten
+   - Tiefer Experten-Kontext via System-Prompt
+   - Kosten: ~0,02-0,05 € pro Frage
+
+### 📸 Rechnungs-Check
+- Foto aufnehmen oder PDF hochladen
+- Automatische Prüfung nach § 14 UStG
+- 10 Pflichtangaben werden geprüft
+- Risiko-Einordnung mit konkreten Hinweisen
+
+### 🧮 Simulation
+- What-if-Slider für zusätzlichen Umsatz
+- Live-Anpassung der Grenze-Prozente
+- Ampel-System (grün/gelb/orange/rot)
+- Typische Einordnung mit § 19 UStG
+
+### 📊 Prognose
+- Jahresend-Hochrechnung
+- Ampel-System mit klaren Empfehlungen
+- IST-Zahlen + Spielraum
+
+### 📤 Export für Steuerberater
+- **3 Formate**: DATEV CSV, Excel CSV, HTML/PDF-Bericht
+- DATEV mit SKR03-Kontenmapping
+- PDF-Bericht druckfertig mit allen Paragraphen
+- **Email-Integration**: vorgefertigtes Anschreiben
+- **Versand-Historie**: Jeder Export gespeichert mit Protokoll-ID
+- **GoBD-konform** (8 Jahre Archivierung ab 2025)
+
+### 👤 Profil
+- Name, Branche, Umsatzziel
+- API-Key für KI-Modus
+- Export-Zugang
+- App-Reset
+
+---
+
+## 🏭 Unterstützte Branchen (16)
+
+1. 💻 IT & Entwicklung
+2. 🎨 Design & Kreativ
+3. 📊 Beratung & Coaching
+4. 🛒 Handel & E-Commerce
+5. 🔧 Handwerk
+6. 📱 Content Creator
+7. 📢 Marketing & Werbung
+8. 🍽️ Gastronomie & Hotel
+9. ⚕️ Gesundheit & Therapie
+10. 📚 Bildung & Training
+11. 🏠 Immobilien
+12. 🚗 KFZ & Mobilität
+13. 🎉 Event & Veranstaltung
+14. 💰 Finanz & Versicherung
+15. ⚖️ Recht & Steuer
+16. 📦 Sonstiges (Universal-Tipps)
+
+---
+
+## 📋 Aktueller Rechtsstand (April 2026)
+
+Alle Werte und Gesetze sind aktuell:
+
+- **Kleinunternehmergrenze** (NEU 2025): 25.000 € Vorjahr / 100.000 € lfd. Jahr NETTO
+- **Grundfreibetrag** 2025: 12.096 € / 2026: 12.348 €
+- **Geschenke-Grenze** (NEU 2024): 50 € (vorher 35 €)
+- **Homeoffice-Pauschale**: 6 €/Tag, max. 1.260 €/Jahr
+- **Kilometerpauschale**: 0,30 €/km
+- **Aufbewahrung Rechnungen** (NEU 2025): 8 Jahre (vorher 10)
+- **E-Rechnungspflicht B2B**: Empfang ab 2025, Versand ab 2027/2028
+- **GWG-Grenze**: 800 € netto
+- **Computer-Hardware-AfA**: 1 Jahr (BMF 22.02.2022)
+- **Wachstumschancengesetz 2024**: Umsetzung aller Änderungen
+
+---
+
+## 🔐 Datenschutz
+
+**Alle Daten bleiben auf deinem Gerät.**
+
+- Speicherung: `localStorage` im Browser
+- Kein Server-Upload
+- Kein Tracking, keine Analytics
+- Bei API-Modus: Dein API-Key geht direkt zu Anthropic (ohne TaxPilot-Server)
+
+---
+
+## ⚖️ Rechtlicher Hinweis
+
+**TaxPilot ist KEIN Steuerberater.**
+
+Die App gibt Hinweise basierend auf öffentlich verfügbaren Gesetzen und ersetzt nicht die individuelle Beratung durch einen Steuerberater (StBerG).
+
+Alle Angaben ohne Gewähr. Für verbindliche steuerliche Einordnung wende dich an einen zugelassenen Steuerberater.
+
+---
+
+## 🧪 Technischer Stack
+
+- **React 19** (inline gebündelt)
+- **esbuild** (Compiler)
+- **Pure JavaScript** im Browser (kein Babel-Runtime)
+- **Offline-first** (localStorage)
+- **Mobile-optimiert** (iOS, Android)
+
+---
+
+## 📝 Version
+
+**v3.0 – Released: April 2026**
+
+- 7.022 Zeilen JavaScript
+- 417 KB HTML (alles inklusive)
+- 16 Branchen
+- 35+ Steuer-Fakten
+- 39+ Experten-Antworten
+- 20+ detaillierte Tipps
+
+---
+
+## 💬 Feedback & Support
+
+Dieses Projekt wurde von Mischa in Zusammenarbeit mit Claude (Anthropic) entwickelt.
+
+Bei Fragen oder Verbesserungsvorschlägen: Einfach in die App integrieren und iterieren.
+
+**Made in Chemnitz 🇩🇪**
