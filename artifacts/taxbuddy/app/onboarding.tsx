@@ -33,9 +33,8 @@ import { Branch } from "@/types";
 const { width: W, height: H } = Dimensions.get("window");
 
 const imgThumbs = require("@/assets/images/raccoon_suit_thumbs_nobg.png");
-const imgMascot = require("@/assets/images/raccoon_mascot.png");
-const imgCircle = require("@/assets/images/raccoon_logo_circle.jpeg");
 
+const BG    = "#0A1628"; // near-black navy
 const NAVY  = "#0F2B4C";
 const BLUE  = "#0066B3";
 const GREEN = "#3DB54A";
@@ -64,36 +63,47 @@ const branches: { id: Branch; label: string }[] = [
 
 /* ══════════════════════════════════════════════
    SLIDE 0 — AUFMERKSAMKEIT
-   Split: text left | big raccoon right
+   Text top, mascot bottom-left
 ══════════════════════════════════════════════ */
 function Slide0() {
+  const checks = ["Steuern verstehen", "Geld sparen", "Stress vermeiden"];
   return (
-    <View style={[sl.root, { backgroundColor: BLUE, flexDirection: "row" }]}>
-      <Animated.View entering={FadeInLeft.duration(500).springify()} style={sl.s0Left}>
-        <Text style={sl.taxWord}>TAX</Text>
-        <Text style={sl.buddyWord}>buddy</Text>
-        <View style={sl.divider} />
-        <Text style={sl.overline}>STEUERN IM GRIFF</Text>
-        <Text style={sl.s0Sub}>
-          Dein smarter{"\n"}Steuer-Buddy fur{"\n"}Kleinunternehmer.
-        </Text>
-        <View style={{ gap: 7, marginTop: 18 }}>
-          {["Probleme aufzeigen", "Risiken verstehen", "Losung prasent.", "Vertrauen aufbauen"].map((item, i) => (
+    <View style={[sl.root, { backgroundColor: BG }]}>
+      {/* Top content */}
+      <Animated.View entering={FadeInLeft.duration(480)} style={sl.s0Top}>
+        {/* Wordmark */}
+        <View style={sl.wordmark}>
+          <Text style={sl.taxWord}>TAX</Text>
+          <Text style={sl.buddyWord}>buddy</Text>
+        </View>
+        <Animated.Text entering={FadeInUp.duration(380).delay(120)} style={sl.s0Sub}>
+          Dein smarter{" "}
+          <Text style={{ color: GREEN }}>Steuer-Buddy</Text>
+          {" "}fur Selbstandige & Kleinunternehmer.
+        </Animated.Text>
+        <View style={{ gap: 10, marginTop: 20 }}>
+          {checks.map((c, i) => (
             <Animated.View
-              key={item}
-              entering={FadeInLeft.duration(350).delay(300 + i * 60).springify()}
-              style={sl.bullet}
+              key={c}
+              entering={FadeInLeft.duration(360).delay(220 + i * 80).springify()}
+              style={sl.checkRow}
             >
-              <View style={sl.bulletDot} />
-              <Text style={sl.bulletText}>{item}</Text>
+              <View style={sl.checkBadge}><Text style={sl.checkBadgeText}>✓</Text></View>
+              <Text style={sl.checkLabel}>{c}</Text>
             </Animated.View>
           ))}
         </View>
       </Animated.View>
 
-      <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.s0Right}>
-        <Image source={imgThumbs} style={sl.mascotBig} resizeMode="contain" />
+      {/* Bottom: mascot bottom-left */}
+      <Animated.View
+        entering={FadeInUp.duration(500).delay(80).springify()}
+        style={sl.s0MascotWrap}
+      >
+        <Image source={imgThumbs} style={sl.s0Mascot} resizeMode="contain" />
       </Animated.View>
+
+      {/* Glow */}
       <View style={sl.glow} />
     </View>
   );
@@ -102,50 +112,60 @@ function Slide0() {
 /* ══════════════════════════════════════════════
    SLIDE 1 — NUTZEN VERSTEHEN
    "Alles im Blick. Alles an einem Ort."
-   Split: content left | raccoon mascot right
+   Text top + phone mockup center
 ══════════════════════════════════════════════ */
 function Slide1() {
   return (
-    <View style={[sl.root, { backgroundColor: NAVY, flexDirection: "row" }]}>
-      {/* Left content */}
-      <Animated.View entering={FadeInLeft.duration(500)} style={sl.s1Left}>
-        <Animated.Text entering={FadeInUp.duration(350).delay(100)} style={sl.overline}>
+    <View style={[sl.root, { backgroundColor: BG }]}>
+      <Animated.View entering={FadeInDown.duration(420)} style={sl.centerPad}>
+        <Animated.Text entering={FadeInUp.duration(350).delay(80)} style={sl.overline}>
           NUTZEN VERSTEHEN
         </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(160)} style={sl.headlineSm}>
-          Alles im Blick.{"\n"}Alles an{"\n"}einem Ort.
+        <Animated.Text entering={FadeInUp.duration(400).delay(140)} style={sl.headlineLg}>
+          Alles im Blick.{"\n"}
+          <Text style={{ color: BLUE }}>Alles an einem Ort.</Text>
         </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(220)} style={sl.bodyText}>
-          Einnahmen, Ausgaben, Fahrten und Steuertipps — automatisch.
+        <Animated.Text entering={FadeInUp.duration(380).delay(200)} style={sl.bodyGray}>
+          Einnahmen, Ausgaben, Fahrten, Steuertipps und mehr — ubersichtlich und automatisch.
         </Animated.Text>
 
-        {/* Mini dashboard card */}
-        <Animated.View entering={FadeInUp.duration(400).delay(300).springify()} style={sl.miniCard}>
-          <View style={sl.miniRow}>
-            <Text style={sl.miniIcon}>↑</Text>
-            <View>
-              <Text style={sl.miniLabel}>Einnahmen</Text>
-              <Text style={[sl.miniVal, { color: GREEN }]}>21.132 €</Text>
-            </View>
+        {/* Phone mockup */}
+        <Animated.View
+          entering={FadeInUp.duration(500).delay(300).springify()}
+          style={sl.phoneMock}
+        >
+          {/* Mock status bar */}
+          <View style={sl.mockBar}>
+            <Text style={sl.mockBarText}>9:41</Text>
+            <Text style={sl.mockBarText}>Ubersicht</Text>
           </View>
-          <View style={[sl.miniDivider]} />
-          <View style={sl.miniRow}>
-            <Text style={[sl.miniIcon, { color: RED }]}>↓</Text>
-            <View>
-              <Text style={sl.miniLabel}>Ausgaben</Text>
-              <Text style={[sl.miniVal, { color: RED }]}>5.668 €</Text>
+          {/* Income row */}
+          <View style={sl.mockSection}>
+            <Text style={sl.mockSectionLabel}>Einnahmen (YTD)</Text>
+            <View style={sl.mockNumRow}>
+              <Text style={[sl.mockNum, { color: GREEN }]}>21.132 €</Text>
+              <Text style={sl.mockTag}>+12.1%</Text>
             </View>
+            <View style={sl.mockBar2} />
+          </View>
+          {/* Expense row */}
+          <View style={sl.mockSection}>
+            <Text style={sl.mockSectionLabel}>Ausgaben (YTD)</Text>
+            <View style={sl.mockNumRow}>
+              <Text style={[sl.mockNum, { color: RED }]}>5.668 €</Text>
+              <Text style={[sl.mockTag, { backgroundColor: RED + "22", color: RED }]}>-42.1%</Text>
+            </View>
+            <View style={[sl.mockBar2, { backgroundColor: RED + "40" }]} />
+          </View>
+          {/* Mock nav */}
+          <View style={sl.mockNav}>
+            {["Einnahmen", "Ausgaben", "Fahrten"].map((t) => (
+              <View key={t} style={sl.mockNavItem}>
+                <Text style={sl.mockNavLabel}>{t}</Text>
+              </View>
+            ))}
           </View>
         </Animated.View>
-
-        <Animated.View entering={FadeInUp.duration(350).delay(400).springify()} style={sl.greenChip}>
-          <Text style={sl.greenChipText}>Steuer-Check aktiv</Text>
-        </Animated.View>
-      </Animated.View>
-
-      {/* Right mascot */}
-      <Animated.View entering={FadeInRight.duration(600).delay(80).springify()} style={sl.s1Right}>
-        <Image source={imgMascot} style={sl.mascotRight} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -153,91 +173,100 @@ function Slide1() {
 
 /* ══════════════════════════════════════════════
    SLIDE 2 — PROBLEM ANSPRECHEN
-   "Kleine Fehler. Grosse Kosten."
-   Top half raccoon, bottom problems list
+   "Kleine Fehler. Große Kosten."
+   Text top-left, raccoon right, floating tags
 ══════════════════════════════════════════════ */
 function Slide2() {
-  const problems = [
-    { label: "Steuerfallen ubersehen",  color: RED },
-    { label: "Fristen verspasst",       color: RED },
-    { label: "Zu hohe Steuerlast",      color: AMBER },
-    { label: "Wichtige Tipps verpasst", color: AMBER },
-    { label: "Geld verschenkt",         color: RED },
+  const tags = [
+    { label: "Steuerfallen\nerkennen",    top: "28%",  left: "2%",  color: RED },
+    { label: "Fristen\nNachzahlungen",    top: "20%",  right: "2%", color: AMBER },
+    { label: "Zu hohe\nNachzahlungen",   top: "62%",  left: "2%",  color: AMBER },
+    { label: "Geld\nverschenken",         top: "55%",  right: "2%", color: RED },
   ];
   return (
-    <View style={[sl.root, { backgroundColor: NAVY }]}>
-      {/* Top: raccoon badge on right, headline on left */}
-      <View style={{ flexDirection: "row", flex: 0.55 }}>
-        <Animated.View entering={FadeInLeft.duration(500)} style={sl.s2TextTop}>
-          <Text style={sl.overline}>PROBLEM ANSPRECHEN</Text>
-          <Text style={sl.headlineSm}>
-            Kleine{"\n"}Fehler.{"\n"}
-            <Text style={{ color: RED }}>Grosse{"\n"}Kosten.</Text>
-          </Text>
-          <Text style={sl.bodyText}>Viele zahlen zu viel Steuern — ohne es zu wissen.</Text>
-        </Animated.View>
-        <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.s2RaccoonWrap}>
-          <Image source={imgMascot} style={sl.mascotSquare} resizeMode="contain" />
-        </Animated.View>
-      </View>
+    <View style={[sl.root, { backgroundColor: BG }]}>
+      {/* Title block */}
+      <Animated.View entering={FadeInLeft.duration(420)} style={sl.s2Top}>
+        <Text style={sl.overline}>PROBLEM ANSPRECHEN</Text>
+        <Text style={sl.headlineLg}>
+          Kleine Fehler.{"\n"}
+          <Text style={{ color: RED }}>Grosse Kosten.</Text>
+        </Text>
+        <Text style={sl.bodyGray}>
+          Viele Selbstandige zahlen zu viel Steuern oder ubersehen wichtige Fristen.
+        </Text>
+      </Animated.View>
 
-      {/* Bottom: problem list */}
-      <View style={{ flex: 0.45, paddingHorizontal: 24, gap: 8, justifyContent: "flex-start", paddingTop: 4 }}>
-        {problems.map((p, i) => (
-          <Animated.View
-            key={p.label}
-            entering={FadeInLeft.duration(350).delay(260 + i * 65).springify()}
-            style={[sl.problemRow, { borderColor: p.color + "35" }]}
-          >
-            <View style={[sl.problemDot, { backgroundColor: p.color }]} />
-            <Text style={sl.problemLabel}>{p.label}</Text>
-          </Animated.View>
-        ))}
-      </View>
+      {/* Raccoon right side */}
+      <Animated.View
+        entering={FadeInRight.duration(500).delay(100).springify()}
+        style={sl.s2MascotWrap}
+      >
+        <Image source={imgThumbs} style={sl.s2Mascot} resizeMode="contain" />
+      </Animated.View>
+
+      {/* Floating problem tags */}
+      {tags.map((tag, i) => (
+        <Animated.View
+          key={tag.label}
+          entering={FadeIn.duration(350).delay(300 + i * 80)}
+          style={[
+            sl.floatTag,
+            {
+              top: tag.top as any,
+              left: "left" in tag ? tag.left as any : undefined,
+              right: "right" in tag ? tag.right as any : undefined,
+              borderColor: tag.color + "50",
+            },
+          ]}
+        >
+          <View style={[sl.floatDot, { backgroundColor: tag.color }]} />
+          <Text style={sl.floatLabel}>{tag.label}</Text>
+        </Animated.View>
+      ))}
     </View>
   );
 }
 
 /* ══════════════════════════════════════════════
    SLIDE 3 — LÖSUNG PRÄSENTIEREN
-   "TAXbuddy warnt dich rechtzeitig."
-   Split: solutions left | raccoon right
+   "Dein smarter Buddy warnt dich rechtzeitig."
+   Text + checks top, mascot bottom
 ══════════════════════════════════════════════ */
 function Slide3() {
-  const solutions = [
-    { label: "Fruhwarnung bei Umsatzlimit",  sub: "Sobald du 22.000 EUR naherst" },
-    { label: "Sparpotenziale erkennen",       sub: "KI analysiert deine Ausgaben" },
-    { label: "Personliche Steuertipps",       sub: "Passend zu deiner Branche" },
-  ];
+  const items = ["Fruhwarnungen", "Steuerprognosen", "Sparpotenziale", "Personliche Tipps"];
   return (
-    <View style={[sl.root, { backgroundColor: NAVY, flexDirection: "row" }]}>
-      {/* Left */}
-      <Animated.View entering={FadeInLeft.duration(500)} style={sl.s3Left}>
+    <View style={[sl.root, { backgroundColor: BG }]}>
+      {/* Top content */}
+      <Animated.View entering={FadeInLeft.duration(420)} style={sl.s3Top}>
         <Text style={sl.overline}>LOSUNG PRASENTIEREN</Text>
-        <Text style={sl.headlineSm}>
-          TAXbuddy{"\n"}warnt dich{"\n"}rechtzeitig.
+        <Text style={sl.headlineLg}>
+          Dein smarter Buddy{"\n"}
+          <Text style={{ color: GREEN }}>warnt dich rechtzeitig.</Text>
         </Text>
-        <Text style={[sl.bodyText, { marginBottom: 10 }]}>Bevor es teuer wird.</Text>
-        {solutions.map((s, i) => (
-          <Animated.View
-            key={s.label}
-            entering={FadeInUp.duration(350).delay(280 + i * 80).springify()}
-            style={sl.solutionRow}
-          >
-            <View style={sl.checkCircle}>
-              <Text style={sl.checkMark}>✓</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={sl.solutionLabel}>{s.label}</Text>
-              <Text style={sl.solutionSub}>{s.sub}</Text>
-            </View>
-          </Animated.View>
-        ))}
+        <Text style={sl.bodyGray}>
+          TAXbuddy analysiert deine Zahlen und gibt dir klare Empfehlungen — bevor es teuer wird.
+        </Text>
+        <View style={{ gap: 9, marginTop: 14 }}>
+          {items.map((item, i) => (
+            <Animated.View
+              key={item}
+              entering={FadeInLeft.duration(340).delay(240 + i * 70).springify()}
+              style={sl.checkRow}
+            >
+              <View style={sl.checkBadge}><Text style={sl.checkBadgeText}>✓</Text></View>
+              <Text style={sl.checkLabel}>{item}</Text>
+            </Animated.View>
+          ))}
+        </View>
       </Animated.View>
 
-      {/* Right raccoon */}
-      <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.s3Right}>
-        <Image source={imgThumbs} style={sl.mascotRight} resizeMode="contain" />
+      {/* Mascot bottom */}
+      <Animated.View
+        entering={FadeInUp.duration(500).delay(80).springify()}
+        style={sl.s3MascotWrap}
+      >
+        <Image source={imgThumbs} style={sl.s3Mascot} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -245,8 +274,8 @@ function Slide3() {
 
 /* ══════════════════════════════════════════════
    SLIDE 4 — SOFORT ZEIGEN
-   "In 60 Sekunden startklar."
-   Timer left | raccoon right
+   "Starte in 60 Sekunden..."
+   Text + timer + checklist (no raccoon)
 ══════════════════════════════════════════════ */
 function Slide4() {
   const pulse = useSharedValue(1);
@@ -262,37 +291,43 @@ function Slide4() {
   }, []);
   const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
+  const steps = ["Basisdaten eingeben", "Erste Analyse erhalten", "Sofort Klarheit gewinnen"];
   return (
-    <View style={[sl.root, { backgroundColor: NAVY, flexDirection: "row" }]}>
-      {/* Left: timer + text */}
-      <Animated.View entering={FadeInLeft.duration(500)} style={sl.s4Left}>
-        <Text style={sl.overline}>SOFORT ZEIGEN</Text>
-        <Text style={sl.headlineSm}>In 60{"\n"}Sekunden{"\n"}startklar.</Text>
+    <View style={[sl.root, { backgroundColor: BG }]}>
+      <Animated.View entering={FadeInDown.duration(420)} style={sl.centerPad}>
+        <Animated.Text entering={FadeInUp.duration(350).delay(80)} style={sl.overline}>
+          SOFORTWERT ZEIGEN
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(400).delay(140)} style={sl.headlineLg}>
+          Starte in{" "}
+          <Text style={{ color: GREEN }}>60 Sekunden</Text>
+          {"\n"}und sieh sofort den Unterschied.
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(380).delay(200)} style={sl.bodyGray}>
+          Erste Auswertung in weniger als einer Minute — kostenlos & unverbindlich.
+        </Animated.Text>
 
-        <Animated.View style={[sl.timerRing, pulseStyle]}>
-          <Text style={sl.timerNum}>60</Text>
-          <Text style={sl.timerSec}>Sek.</Text>
+        {/* Timer */}
+        <Animated.View entering={FadeIn.duration(500).delay(280)} style={{ alignSelf: "center" }}>
+          <Animated.View style={[sl.timerRing, pulseStyle]}>
+            <Text style={sl.timerNum}>60</Text>
+            <Text style={sl.timerSec}>Sekunden</Text>
+          </Animated.View>
         </Animated.View>
 
-        <Text style={sl.bodyText}>Erste Auswertung in weniger als einer Minute — kostenlos.</Text>
-
-        <View style={{ gap: 8, marginTop: 6 }}>
-          {["Angaben eingeben", "Analyse starten", "Ergebnis erhalten"].map((s, i) => (
+        {/* Steps */}
+        <View style={{ gap: 10, marginTop: 8 }}>
+          {steps.map((s, i) => (
             <Animated.View
               key={s}
-              entering={FadeInLeft.duration(300).delay(320 + i * 70).springify()}
-              style={sl.step3Item}
+              entering={FadeInLeft.duration(320).delay(360 + i * 70).springify()}
+              style={sl.stepRow}
             >
-              <View style={sl.step3Num}><Text style={sl.step3NumText}>{i + 1}</Text></View>
-              <Text style={sl.step3Label}>{s}</Text>
+              <View style={sl.stepCheck}><Text style={sl.stepCheckText}>✓</Text></View>
+              <Text style={sl.checkLabel}>{i + 1}. {s}</Text>
             </Animated.View>
           ))}
         </View>
-      </Animated.View>
-
-      {/* Right: raccoon */}
-      <Animated.View entering={FadeInRight.duration(600).delay(120).springify()} style={sl.s4Right}>
-        <Image source={imgMascot} style={sl.mascotRight} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -301,59 +336,57 @@ function Slide4() {
 /* ══════════════════════════════════════════════
    SLIDE 5 — HANDLUNG & VERTRAUEN
    "Kostenlos starten. Jederzeit upgraden."
-   Circle portrait top | pricing cards below
+   Pricing cards
 ══════════════════════════════════════════════ */
 function Slide5() {
-  const freeFeatures    = ["Basis-Ubersicht", "Einnahmen & Ausgaben", "Top-Steuertipp"];
-  const premiumFeatures = ["Unbegrenzte Eintrage", "KI-Assistent", "Steuer-Check & Export"];
+  const freeFeatures    = ["Basis-Ubersicht", "Einnahmen & Ausgaben", "Top-Steuertipps", "Begrenzte KI-Anfragen"];
+  const premiumFeatures = ["Unbegrenzte KI", "Steuerprognosen", "Erweiterte Analysen", "Steuer-Check & Export"];
   return (
-    <View style={[sl.root, { backgroundColor: NAVY }]}>
-      {/* Top: raccoon portrait + headline side by side */}
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 28, paddingTop: 32, gap: 20, flex: 0.40 }}>
-        <Animated.View entering={FadeIn.duration(400).delay(60)} style={sl.portraitWrap}>
-          <Image source={imgCircle} style={sl.portraitImg} resizeMode="cover" />
-        </Animated.View>
-        <Animated.View entering={FadeInRight.duration(400).delay(120)} style={{ flex: 1 }}>
-          <Text style={sl.overline}>HANDLUNG & VERTRAUEN</Text>
-          <Text style={[sl.headlineSm, { fontSize: 20, lineHeight: 26 }]}>
-            Kostenlos{"\n"}starten.{"\n"}
-            <Text style={{ color: GREEN }}>Jederzeit{"\n"}upgraden.</Text>
-          </Text>
-        </Animated.View>
-      </View>
+    <View style={[sl.root, { backgroundColor: BG }]}>
+      <Animated.View entering={FadeInDown.duration(420)} style={sl.centerPad}>
+        <Animated.Text entering={FadeInUp.duration(350).delay(80)} style={sl.overline}>
+          HANDLUNG & VERTRAUEN
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(400).delay(140)} style={sl.headlineLg}>
+          Kostenlos starten.{"\n"}
+          <Text style={{ color: GREEN }}>Jederzeit upgraden.</Text>
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(380).delay(200)} style={sl.bodyGray}>
+          Teste alle Basis-Funktionen gratis. Upgrade, wenn du mehr willst.
+        </Animated.Text>
 
-      {/* Pricing cards */}
-      <Animated.View
-        entering={FadeInUp.duration(500).delay(260).springify()}
-        style={sl.pricingRow}
-      >
-        {/* Free */}
-        <View style={[sl.pricingCard, { borderColor: "rgba(255,255,255,0.15)" }]}>
-          <Text style={sl.pricingTier}>Kostenlos</Text>
-          <Text style={sl.pricingPrice}>0 €</Text>
-          {freeFeatures.map((f) => (
-            <View key={f} style={sl.pricingFeature}>
-              <Text style={[sl.checkMark, { fontSize: 11, color: GREEN }]}>✓</Text>
-              <Text style={sl.pricingFeatureText}>{f}</Text>
-            </View>
-          ))}
-        </View>
+        <Animated.View
+          entering={FadeInUp.duration(500).delay(300).springify()}
+          style={sl.pricingRow}
+        >
+          {/* Free */}
+          <View style={[sl.pricingCard, { borderColor: "rgba(255,255,255,0.14)" }]}>
+            <Text style={sl.pricingTier}>Kostenlos</Text>
+            <Text style={sl.pricingPrice}>0 €</Text>
+            {freeFeatures.map((f) => (
+              <View key={f} style={sl.pricingFeat}>
+                <Text style={{ color: GREEN, fontFamily: "Inter_700Bold", fontSize: 11 }}>✓</Text>
+                <Text style={sl.pricingFeatText}>{f}</Text>
+              </View>
+            ))}
+          </View>
 
-        {/* Premium */}
-        <View style={[sl.pricingCard, { borderColor: GREEN, backgroundColor: "rgba(61,181,74,0.08)" }]}>
-          <View style={sl.premiumBadge}><Text style={sl.premiumBadgeText}>Premium</Text></View>
-          <Text style={sl.pricingTier}>Premium</Text>
-          <Text style={[sl.pricingPrice, { color: GREEN }]}>
-            ab 2,99 €
-            <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>/Monat</Text>
-          </Text>
-          {premiumFeatures.map((f) => (
-            <View key={f} style={sl.pricingFeature}>
-              <Text style={[sl.checkMark, { fontSize: 11, color: GREEN }]}>✓</Text>
-              <Text style={sl.pricingFeatureText}>{f}</Text>
-            </View>
-          ))}
-        </View>
+          {/* Premium */}
+          <View style={[sl.pricingCard, { borderColor: GREEN, backgroundColor: "rgba(61,181,74,0.07)" }]}>
+            <View style={sl.premiumBadge}><Text style={sl.premiumBadgeText}>Premium</Text></View>
+            <Text style={sl.pricingTier}>Premium</Text>
+            <Text style={[sl.pricingPrice, { color: GREEN }]}>
+              ab 2,99 €
+              <Text style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>/Monat</Text>
+            </Text>
+            {premiumFeatures.map((f) => (
+              <View key={f} style={sl.pricingFeat}>
+                <Text style={{ color: GREEN, fontFamily: "Inter_700Bold", fontSize: 11 }}>✓</Text>
+                <Text style={sl.pricingFeatText}>{f}</Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
       </Animated.View>
     </View>
   );
@@ -362,7 +395,7 @@ function Slide5() {
 const SLIDES = [Slide0, Slide1, Slide2, Slide3, Slide4, Slide5];
 
 /* ══════════════════════════════════════════════
-   ANIMATED PROGRESS BAR (setup phase)
+   ANIMATED PROGRESS BAR
 ══════════════════════════════════════════════ */
 const TRACK_W = W - 48;
 
@@ -438,19 +471,19 @@ export default function OnboardingScreen() {
   if (phase === "intro") {
     const SlideComp = SLIDES[slideIdx];
     return (
-      <View style={{ flex: 1, backgroundColor: NAVY }}>
-        <Animated.View key={slideIdx} style={{ flex: 1 }} entering={FadeIn.duration(280)}>
+      <View style={{ flex: 1, backgroundColor: BG }}>
+        <Animated.View key={slideIdx} style={{ flex: 1 }} entering={FadeIn.duration(260)}>
           <SlideComp />
         </Animated.View>
 
         {/* Bottom controls */}
-        <View style={[ctrl.container, { paddingBottom: insets.bottom + 24 }]}>
+        <View style={[ctrl.container, { paddingBottom: insets.bottom + 20 }]}>
           <View style={ctrl.dots}>
             {SLIDES.map((_, i) => (
               <View
                 key={i}
                 style={[ctrl.dot, {
-                  backgroundColor: i === slideIdx ? GREEN : "rgba(255,255,255,0.3)",
+                  backgroundColor: i === slideIdx ? GREEN : "rgba(255,255,255,0.28)",
                   width: i === slideIdx ? 22 : 8,
                 }]}
               />
@@ -472,7 +505,7 @@ export default function OnboardingScreen() {
                 style={[ctrl.nextBtn, { backgroundColor: isLastSlide ? GREEN : BLUE }]}
               >
                 <Text style={ctrl.nextText}>
-                  {isLastSlide ? "Los geht's" : "Weiter"}
+                  {isLastSlide ? "Los geht's!" : "Weiter"}
                 </Text>
               </Pressable>
             </Animated.View>
@@ -500,7 +533,6 @@ export default function OnboardingScreen() {
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 120 }]}
         bottomOffset={40}
       >
-        {/* Step 1 — Name */}
         {step === 1 && (
           <Animated.View key="s1" entering={FadeInUp.duration(420).springify()} style={styles.stepWrap}>
             <Animated.View entering={FadeIn.duration(350)} style={[styles.heroBanner, { backgroundColor: BLUE }]}>
@@ -530,7 +562,6 @@ export default function OnboardingScreen() {
           </Animated.View>
         )}
 
-        {/* Step 2 — Branch */}
         {step === 2 && (
           <Animated.View key="s2" entering={FadeInUp.duration(400).springify()} style={styles.stepWrap}>
             <Animated.Text entering={FadeInDown.duration(350)} style={[styles.title, { color: colors.foreground }]}>
@@ -565,7 +596,6 @@ export default function OnboardingScreen() {
           </Animated.View>
         )}
 
-        {/* Step 3 — Revenue */}
         {step === 3 && (
           <Animated.View key="s3" entering={FadeInUp.duration(400).springify()} style={styles.stepWrap}>
             <Animated.Text entering={FadeInDown.duration(350)} style={[styles.title, { color: colors.foreground }]}>
@@ -597,7 +627,6 @@ export default function OnboardingScreen() {
         )}
       </KeyboardAwareScrollViewCompat>
 
-      {/* Footer CTA */}
       <Animated.View
         entering={FadeInUp.duration(400).delay(80)}
         style={[styles.footer, { paddingBottom: insets.bottom + 20, backgroundColor: colors.background }]}
@@ -619,93 +648,84 @@ export default function OnboardingScreen() {
 /* ══════════════════════════════════════════════
    STYLES
 ══════════════════════════════════════════════ */
-const MASCOT_H = H * 0.58;
-const MASCOT_HALF_H = H * 0.50;
-
 const sl = StyleSheet.create({
   root: { flex: 1 },
-  glow: { position: "absolute", bottom: -60, left: -40, width: W * 1.2, height: 180, borderRadius: 999, backgroundColor: "rgba(61,181,74,0.07)" },
+  glow: { position: "absolute", bottom: 0, left: -40, width: W * 1.2, height: 200, borderRadius: 999, backgroundColor: "rgba(61,181,74,0.06)" },
+
+  /* Shared typography */
+  overline:   { color: "rgba(255,255,255,0.38)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 2.2, textTransform: "uppercase", marginBottom: 2 },
+  headlineLg: { color: "#ffffff", fontFamily: "Inter_800ExtraBold", fontSize: 24, lineHeight: 30 },
+  bodyGray:   { color: "rgba(255,255,255,0.58)", fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 19 },
 
   /* ── Slide 0 ── */
-  s0Left:      { flex: 1, justifyContent: "flex-end", paddingLeft: 28, paddingBottom: 70, gap: 2, zIndex: 2 },
-  s0Right:     { width: W * 0.50, alignItems: "flex-end", justifyContent: "flex-end" },
-  taxWord:     { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 50, letterSpacing: -2, lineHeight: 52 },
-  buddyWord:   { color: GREEN,  fontFamily: "Inter_400Regular",   fontSize: 50, letterSpacing: -2, lineHeight: 54, marginBottom: 10 },
-  divider:     { width: 36, height: 2, backgroundColor: "rgba(255,255,255,0.3)", marginBottom: 8 },
-  overline:    { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 2.2, marginBottom: 6 },
-  s0Sub:       { color: "rgba(255,255,255,0.80)", fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 19 },
-  mascotBig:   { width: W * 0.52, height: MASCOT_H },
-  bullet:      { flexDirection: "row", alignItems: "center", gap: 8 },
-  bulletDot:   { width: 5, height: 5, borderRadius: 3, backgroundColor: GREEN },
-  bulletText:  { color: "rgba(255,255,255,0.72)", fontFamily: "Inter_500Medium", fontSize: 12 },
+  s0Top:       { paddingTop: 52, paddingHorizontal: 28, gap: 6 },
+  wordmark:    { flexDirection: "row", alignItems: "baseline", gap: 4, marginBottom: 6 },
+  taxWord:     { color: "#ffffff", fontFamily: "Inter_800ExtraBold", fontSize: 46, letterSpacing: -2, lineHeight: 48 },
+  buddyWord:   { color: GREEN,    fontFamily: "Inter_400Regular",   fontSize: 46, letterSpacing: -2, lineHeight: 48 },
+  s0Sub:       { color: "rgba(255,255,255,0.78)", fontFamily: "Inter_500Medium", fontSize: 14, lineHeight: 20 },
+  checkRow:    { flexDirection: "row", alignItems: "center", gap: 10 },
+  checkBadge:  { width: 22, height: 22, borderRadius: 11, backgroundColor: GREEN, alignItems: "center", justifyContent: "center" },
+  checkBadgeText: { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 11 },
+  checkLabel:  { color: "rgba(255,255,255,0.80)", fontFamily: "Inter_600SemiBold", fontSize: 13 },
+  s0MascotWrap: { position: "absolute", bottom: 0, left: -10, width: W * 0.58, height: H * 0.46 },
+  s0Mascot:    { width: "100%", height: "100%" },
 
   /* ── Slide 1 ── */
-  s1Left:      { flex: 1, justifyContent: "center", paddingLeft: 26, paddingBottom: 20, gap: 12 },
-  s1Right:     { width: W * 0.46, alignItems: "flex-end", justifyContent: "flex-end" },
-  mascotRight: { width: W * 0.48, height: MASCOT_HALF_H },
-  miniCard:    { backgroundColor: "rgba(255,255,255,0.07)", borderRadius: 14, padding: 12, borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", gap: 8 },
-  miniRow:     { flexDirection: "row", alignItems: "center", gap: 10 },
-  miniIcon:    { color: GREEN, fontFamily: "Inter_800ExtraBold", fontSize: 18, width: 22, textAlign: "center" },
-  miniLabel:   { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_500Medium", fontSize: 11 },
-  miniVal:     { fontFamily: "Inter_700Bold", fontSize: 15 },
-  miniDivider: { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
-  greenChip:   { alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 },
-  greenChipText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 11 },
+  centerPad:   { flex: 1, paddingTop: 44, paddingHorizontal: 24, gap: 12 },
+  phoneMock:   { backgroundColor: "#0E1E35", borderRadius: 18, overflow: "hidden", borderWidth: 1, borderColor: "rgba(255,255,255,0.10)", gap: 0 },
+  mockBar:     { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.07)" },
+  mockBarText: { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_600SemiBold", fontSize: 11 },
+  mockSection: { paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.06)", gap: 4 },
+  mockSectionLabel: { color: "rgba(255,255,255,0.4)", fontFamily: "Inter_500Medium", fontSize: 11 },
+  mockNumRow:  { flexDirection: "row", alignItems: "center", gap: 10 },
+  mockNum:     { fontFamily: "Inter_800ExtraBold", fontSize: 22 },
+  mockTag:     { backgroundColor: GREEN + "22", color: GREEN, fontFamily: "Inter_700Bold", fontSize: 10, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  mockBar2:    { height: 4, backgroundColor: GREEN + "40", borderRadius: 2, marginTop: 4 },
+  mockNav:     { flexDirection: "row", justifyContent: "space-around", paddingVertical: 10, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.07)" },
+  mockNavItem: { alignItems: "center" },
+  mockNavLabel: { color: "rgba(255,255,255,0.4)", fontFamily: "Inter_500Medium", fontSize: 10 },
 
   /* ── Slide 2 ── */
-  s2TextTop:   { flex: 1, justifyContent: "flex-end", paddingLeft: 26, paddingBottom: 12, gap: 6 },
-  s2RaccoonWrap: { width: W * 0.44, justifyContent: "flex-end", alignItems: "flex-end" },
-  mascotSquare: { width: W * 0.42, height: W * 0.52, borderRadius: 0 },
-  problemRow:  { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
-  problemDot:  { width: 7, height: 7, borderRadius: 4 },
-  problemLabel: { color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 13 },
+  s2Top:        { paddingTop: 52, paddingHorizontal: 28, gap: 6, width: "55%" },
+  s2MascotWrap: { position: "absolute", bottom: 0, right: -10, width: W * 0.55, height: H * 0.56 },
+  s2Mascot:     { width: "100%", height: "100%" },
+  floatTag:     { position: "absolute", backgroundColor: "rgba(15,25,50,0.88)", borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7, gap: 4, flexDirection: "row", alignItems: "flex-start", maxWidth: 120 },
+  floatDot:     { width: 6, height: 6, borderRadius: 3, marginTop: 3 },
+  floatLabel:   { color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 10, lineHeight: 14, flex: 1 },
 
   /* ── Slide 3 ── */
-  s3Left:      { flex: 1, justifyContent: "center", paddingLeft: 26, paddingBottom: 20, gap: 10 },
-  s3Right:     { width: W * 0.46, alignItems: "flex-end", justifyContent: "flex-end" },
-  solutionRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(61,181,74,0.28)", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
-  checkCircle: { width: 24, height: 24, borderRadius: 12, backgroundColor: GREEN, alignItems: "center", justifyContent: "center", marginTop: 1 },
-  checkMark:   { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 12 },
-  solutionLabel: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13, lineHeight: 17 },
-  solutionSub:   { color: "rgba(255,255,255,0.48)", fontFamily: "Inter_500Medium", fontSize: 11, marginTop: 2 },
+  s3Top:        { paddingTop: 52, paddingHorizontal: 28, gap: 6 },
+  s3MascotWrap: { position: "absolute", bottom: 0, right: -10, width: W * 0.52, height: H * 0.44 },
+  s3Mascot:     { width: "100%", height: "100%" },
 
-  /* ── Slide 4 ── */
-  s4Left:      { flex: 1, justifyContent: "center", paddingLeft: 26, paddingBottom: 20, gap: 12 },
-  s4Right:     { width: W * 0.44, alignItems: "flex-end", justifyContent: "flex-end" },
-  timerRing:   { width: 90, height: 90, borderRadius: 45, borderWidth: 4, borderColor: GREEN, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(61,181,74,0.10)" },
-  timerNum:    { color: GREEN, fontFamily: "Inter_800ExtraBold", fontSize: 32, lineHeight: 34 },
-  timerSec:    { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 10 },
-  step3Item:   { flexDirection: "row", alignItems: "center", gap: 10 },
-  step3Num:    { width: 26, height: 26, borderRadius: 13, backgroundColor: BLUE, alignItems: "center", justifyContent: "center" },
-  step3NumText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13 },
-  step3Label:  { color: "rgba(255,255,255,0.65)", fontFamily: "Inter_500Medium", fontSize: 12 },
+  /* ── Slide 4 timer ── */
+  timerRing:    { width: 110, height: 110, borderRadius: 55, borderWidth: 4, borderColor: GREEN, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(61,181,74,0.09)", alignSelf: "center" },
+  timerNum:     { color: GREEN, fontFamily: "Inter_800ExtraBold", fontSize: 36, lineHeight: 38 },
+  timerSec:     { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 10 },
+  stepRow:      { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(255,255,255,0.05)", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)" },
+  stepCheck:    { width: 20, height: 20, borderRadius: 10, backgroundColor: GREEN, alignItems: "center", justifyContent: "center" },
+  stepCheckText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 10 },
 
-  /* ── Slide 5 ── */
-  portraitWrap: { width: 90, height: 90, borderRadius: 45, overflow: "hidden", borderWidth: 3, borderColor: GREEN },
-  portraitImg:  { width: 90, height: 90 },
-  pricingRow:   { flexDirection: "row", gap: 10, paddingHorizontal: 20, flex: 0.58, alignItems: "flex-start" },
-  pricingCard:  { flex: 1, borderWidth: 1, borderRadius: 16, padding: 14, gap: 8, backgroundColor: "rgba(255,255,255,0.04)" },
-  pricingTier:  { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase" },
-  pricingPrice: { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 20, lineHeight: 24 },
-  pricingFeature:     { flexDirection: "row", alignItems: "center", gap: 6 },
-  pricingFeatureText: { color: "rgba(255,255,255,0.68)", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1 },
-  premiumBadge:     { alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, marginBottom: 2 },
-  premiumBadgeText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 0.5 },
-
-  /* ── Shared ── */
-  headlineSm: { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 22, lineHeight: 28 },
-  bodyText:   { color: "rgba(255,255,255,0.62)", fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 19 },
+  /* ── Slide 5 pricing ── */
+  pricingRow:       { flexDirection: "row", gap: 10, width: "100%" },
+  pricingCard:      { flex: 1, borderWidth: 1, borderRadius: 16, padding: 12, gap: 7, backgroundColor: "rgba(255,255,255,0.04)" },
+  pricingTier:      { color: "rgba(255,255,255,0.42)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase" },
+  pricingPrice:     { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 19, lineHeight: 22 },
+  pricingFeat:      { flexDirection: "row", alignItems: "center", gap: 6 },
+  pricingFeatText:  { color: "rgba(255,255,255,0.65)", fontFamily: "Inter_500Medium", fontSize: 11, flex: 1 },
+  premiumBadge:     { alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  premiumBadgeText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 9 },
 });
 
 const ctrl = StyleSheet.create({
-  container: { paddingHorizontal: 28, gap: 16, paddingTop: 10 },
+  container: { paddingHorizontal: 24, gap: 14, paddingTop: 10, backgroundColor: BG },
   dots:      { flexDirection: "row", justifyContent: "center", gap: 6, alignItems: "center" },
   dot:       { height: 8, borderRadius: 4 },
   row:       { flexDirection: "row", alignItems: "center", gap: 12 },
   backBtn:   { paddingHorizontal: 18, paddingVertical: 14 },
   backText:  { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_600SemiBold", fontSize: 14 },
   nextWrap:  { flex: 1 },
-  nextBtn:   { height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  nextBtn:   { height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center" },
   nextText:  { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 16 },
 });
 
