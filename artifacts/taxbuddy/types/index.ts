@@ -58,10 +58,11 @@ export interface Expense {
 export interface Trip {
   id: string;
   date: string;
+  time?: string;        // Abfahrtszeit HH:MM
   client: string;
   contact?: string;
   purpose: string;
-  from: string;
+  from: string;         // Startadresse
   to: string;
   km: number;
   roundTrip: boolean;

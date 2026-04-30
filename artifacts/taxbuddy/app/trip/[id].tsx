@@ -89,14 +89,12 @@ export default function TripDetailScreen() {
           },
         ]}
       >
-        <Row label="Datum" value={formatDate(item.date)} colors={colors} />
-        <Row label="Kunde" value={item.client} colors={colors} />
-        <Row label="Zweck" value={item.purpose} colors={colors} />
-        <Row
-          label="Strecke"
-          value={`${item.from || "—"} → ${item.to || "—"}`}
-          colors={colors}
-        />
+        <Row label="Datum"         value={formatDate(item.date)}                        colors={colors} />
+        {item.time ? <Row label="Uhrzeit" value={item.time} colors={colors} /> : null}
+        <Row label="Kunde"         value={item.client}                                  colors={colors} />
+        <Row label="Zweck"         value={item.purpose}                                 colors={colors} />
+        <Row label="Startadresse"  value={item.from || "—"}                             colors={colors} />
+        <Row label="Zieladresse"   value={item.to  || "—"}                             colors={colors} />
         <Row
           label="Art"
           value={item.roundTrip ? "Hin- und Rückfahrt" : "Einfache Fahrt"}
