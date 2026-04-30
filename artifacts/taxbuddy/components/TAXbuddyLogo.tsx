@@ -57,6 +57,7 @@ export function TAXbuddyLogo({
         )}
         <View style={styles.wordmark}>
           <Text
+            numberOfLines={1}
             style={[
               styles.tax,
               { fontSize: s.tax, color: navyColor, letterSpacing: s.letterSpacing },
@@ -65,9 +66,15 @@ export function TAXbuddyLogo({
             TAX
           </Text>
           <Text
+            numberOfLines={1}
             style={[
               styles.buddy,
-              { fontSize: s.buddy, color: BRAND_GREEN, letterSpacing: s.letterSpacing },
+              {
+                fontSize: s.buddy,
+                color: BRAND_GREEN,
+                letterSpacing: s.letterSpacing,
+                paddingRight: Math.abs(s.letterSpacing) + 2,
+              },
             ]}
           >
             buddy
