@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Car, MapPin, Plus, Route as RouteIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { FahrtImport } from "@/components/FahrtImport";
 
 export default function Fahrtenbuch() {
   const { trips, setTrips } = useDataStore();
@@ -60,12 +61,20 @@ export default function Fahrtenbuch() {
           <p className="text-muted-foreground mt-1">Erfasse deine betrieblichen Fahrten für die Kilometerpauschale.</p>
         </div>
         
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#0066B3] hover:bg-[#0066B3]/90 text-white">
-              <Plus className="w-4 h-4 mr-2" /> Neue Fahrt
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <FahrtImport
+            onImport={(newTrips) => {
+              const withIds: Trip[] = newTrips.map(t => ({ ...t, id: crypto.randomUUID() }));
+              setTrips([...trips, ...withIds].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            }}
+          />
+
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#0066B3] hover:bg-[#0066B3]/90 text-white">
+                <Plus className="w-4 h-4 mr-2" /> Neue Fahrt
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Fahrt eintragen</DialogTitle>
@@ -108,7 +117,8 @@ export default function Fahrtenbuch() {
               </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
