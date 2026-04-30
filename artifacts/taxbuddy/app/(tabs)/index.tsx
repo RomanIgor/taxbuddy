@@ -10,8 +10,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { Feather } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -25,6 +23,11 @@ import { useExpenses } from "@/contexts/ExpensesContext";
 import { useTrips } from "@/contexts/TripsContext";
 import { formatCurrency } from "@/utils/format";
 import { LEGAL } from "@/constants/legal";
+import {
+  IconArrowUp, IconArrowDown, IconCar, IconZap,
+  IconFileText, IconSliders, IconTrendingUp, IconUpload,
+  IconUser, IconInfo,
+} from "@/components/DashboardIcons";
 
 const SUCCESS_COLOR  = "#16A34A";
 const SUCCESS_BG     = "#DCFCE7";
@@ -43,22 +46,21 @@ const SKY_BG         = "#E0F2FE";
 type QuickAction = {
   key: string;
   label: string;
-  iconSet: "feather" | "mci";
-  icon: string;
+  IconComponent: React.FC<{ size?: number; color?: string }>;
   iconColor: string;
   iconBg: string;
   href: string;
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { key: "income",     label: "Einnahme",   iconSet: "feather", icon: "arrow-up",     iconColor: SUCCESS_COLOR, iconBg: SUCCESS_BG,  href: "/income/new" },
-  { key: "expense",    label: "Ausgabe",    iconSet: "feather", icon: "arrow-down",   iconColor: WARNING_COLOR, iconBg: WARNING_BG,  href: "/expense/new" },
-  { key: "trip",       label: "Fahrt",      iconSet: "mci",     icon: "car",          iconColor: "#0066B3",     iconBg: PRIMARY_BG,  href: "/trip/new" },
-  { key: "ai",         label: "KI",         iconSet: "feather", icon: "zap",          iconColor: PURPLE_COLOR,  iconBg: PURPLE_BG,   href: "/ai" },
-  { key: "invoice",    label: "Beleg",      iconSet: "feather", icon: "file-text",    iconColor: TEAL_COLOR,    iconBg: TEAL_BG,     href: "/invoice-check" },
-  { key: "simulation", label: "Simulation", iconSet: "feather", icon: "sliders",      iconColor: INDIGO_COLOR,  iconBg: INDIGO_BG,   href: "/simulation" },
-  { key: "forecast",   label: "Prognose",   iconSet: "feather", icon: "trending-up",  iconColor: "#0066B3",     iconBg: PRIMARY_BG,  href: "/forecast" },
-  { key: "export",     label: "Export",     iconSet: "feather", icon: "upload",       iconColor: SKY_COLOR,     iconBg: SKY_BG,      href: "/export" },
+  { key: "income",     label: "Einnahme",   IconComponent: IconArrowUp,    iconColor: SUCCESS_COLOR, iconBg: SUCCESS_BG,  href: "/income/new" },
+  { key: "expense",    label: "Ausgabe",    IconComponent: IconArrowDown,  iconColor: WARNING_COLOR, iconBg: WARNING_BG,  href: "/expense/new" },
+  { key: "trip",       label: "Fahrt",      IconComponent: IconCar,        iconColor: "#0066B3",     iconBg: PRIMARY_BG,  href: "/trip/new" },
+  { key: "ai",         label: "KI",         IconComponent: IconZap,        iconColor: PURPLE_COLOR,  iconBg: PURPLE_BG,   href: "/ai" },
+  { key: "invoice",    label: "Beleg",      IconComponent: IconFileText,   iconColor: TEAL_COLOR,    iconBg: TEAL_BG,     href: "/invoice-check" },
+  { key: "simulation", label: "Simulation", IconComponent: IconSliders,    iconColor: INDIGO_COLOR,  iconBg: INDIGO_BG,   href: "/simulation" },
+  { key: "forecast",   label: "Prognose",   IconComponent: IconTrendingUp, iconColor: "#0066B3",     iconBg: PRIMARY_BG,  href: "/forecast" },
+  { key: "export",     label: "Export",     IconComponent: IconUpload,     iconColor: SKY_COLOR,     iconBg: SKY_BG,      href: "/export" },
 ];
 
 function statusFor(percent: number) {
@@ -135,7 +137,7 @@ export default function DashboardScreen() {
             { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Feather name="user" size={19} color={colors.foreground} />
+          <IconUser size={19} color={colors.foreground} />
         </Pressable>
       </View>
 
@@ -200,7 +202,7 @@ export default function DashboardScreen() {
             { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius, opacity: pressed ? 0.75 : 1 },
           ]}
         >
-          <MaterialCommunityIcons name="car" size={20} color={colors.primary} style={{ marginBottom: 6 }} />
+          <IconCar size={20} color={colors.primary} />
           <Text style={[styles.statValue, { color: colors.foreground }]}>{formatCurrency(tripPauschale)}</Text>
           <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Fahrtkosten</Text>
           <Text style={[styles.statSub, { color: colors.mutedForeground }]}>
@@ -215,7 +217,7 @@ export default function DashboardScreen() {
             { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius, opacity: pressed ? 0.75 : 1 },
           ]}
         >
-          <Feather name="trending-up" size={20} color={colors.primary} style={{ marginBottom: 6 }} />
+          <IconTrendingUp size={20} color={colors.primary} />
           <Text style={[styles.statValue, { color: colors.foreground }]}>{incomes.length} Buchungen</Text>
           <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Einnahmen</Text>
           <Text style={[styles.statSub, { color: colors.mutedForeground }]}>
@@ -247,11 +249,7 @@ export default function DashboardScreen() {
               ]}
             >
               <View style={[styles.actionChip, { backgroundColor: a.iconBg }]}>
-                {a.iconSet === "mci" ? (
-                  <MaterialCommunityIcons name={a.icon as any} size={20} color={a.iconColor} />
-                ) : (
-                  <Feather name={a.icon as any} size={20} color={a.iconColor} />
-                )}
+                <a.IconComponent size={20} color={a.iconColor} />
               </View>
               <Text style={[styles.actionLabel, { color: colors.foreground }]}>{a.label}</Text>
             </Pressable>
@@ -262,7 +260,7 @@ export default function DashboardScreen() {
       {/* ── Tax tip ──────────────────────────────────────── */}
       <View style={[styles.tipCard, { borderColor: "#BFDBFE" }]}>
         <View style={[styles.tipIcon, { backgroundColor: colors.primary }]}>
-          <Feather name="info" size={16} color="#ffffff" />
+          <IconInfo size={16} color="#ffffff" />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={[styles.tipTitle, { color: colors.primary }]}>Steuertipp des Tages</Text>
