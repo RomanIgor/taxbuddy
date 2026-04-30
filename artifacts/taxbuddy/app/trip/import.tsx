@@ -126,9 +126,38 @@ function parseKm(raw: unknown): number {
   return parseFloat(s) || 0;
 }
 
-function readAsBase64(uri: string): Promise<string> {
-  // Use string literal to avoid EncodingType enum being undefined in some SDK versions
-  return FileSystem.readAsStringAsync(uri, { encoding: "base64" as FileSystem.EncodingType });
+async function readAsBase64(asset: DocumentPicker.DocumentPickerAsset): Promise<string> {
+  if (Platform.OS === "web") {
+    // On web, expo-file-system is unavailable. Use the browser File object instead.
+    // expo-document-picker attaches the native File to the asset on web.
+    const file = (asset as unknown as { file?: File }).file;
+    if (!file) {
+      // Fallback: fetch the blob URL
+      const resp = await fetch(asset.uri);
+      const blob = await resp.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(",")[1] ?? "");
+        };
+        reader.onerror = () => reject(new Error("Datei konnte nicht gelesen werden."));
+        reader.readAsDataURL(blob);
+      });
+    }
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // result is "data:<mime>;base64,<data>"
+        resolve(result.split(",")[1] ?? "");
+      };
+      reader.onerror = () => reject(new Error("Datei konnte nicht gelesen werden."));
+      reader.readAsDataURL(file);
+    });
+  }
+  // Native: use expo-file-system (string literal avoids EncodingType enum being undefined)
+  return FileSystem.readAsStringAsync(asset.uri, { encoding: "base64" as FileSystem.EncodingType });
 }
 
 /* ─────────────── Component ─────────────── */
@@ -179,10 +208,10 @@ export default function TripImportScreen() {
       const asset = result.assets[0];
       if (!asset?.uri) throw new Error("Keine Datei ausgewählt.");
 
-      // Read file as base64 (string literal avoids EncodingType.Base64 being undefined)
+      // Read file as base64 — uses FileReader on web, expo-file-system on native
       let base64: string;
       try {
-        base64 = await readAsBase64(asset.uri);
+        base64 = await readAsBase64(asset);
       } catch (fsErr) {
         throw new Error("Datei konnte nicht gelesen werden. Bitte erneut versuchen.");
       }
