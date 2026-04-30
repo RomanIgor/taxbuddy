@@ -1,11 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   Pressable,
   StyleSheet,
-  ScrollView,
   Dimensions,
   Image,
 } from "react-native";
@@ -183,16 +182,21 @@ const SLIDES = [Slide0, Slide1, Slide2, Slide3];
    ANIMATED PROGRESS BAR
 ═══════════════════════════════════════ */
 
+const TRACK_W = W - 48; // 24px horizontal padding each side
+
 function SetupProgress({ step, total }: { step: number; total: number }) {
   const progress = useSharedValue(0);
   useEffect(() => {
-    progress.value = withTiming((step - 1) / total, { duration: 400, easing: Easing.out(Easing.cubic) });
+    progress.value = withTiming((step - 1) / total, {
+      duration: 400,
+      easing: Easing.out(Easing.cubic),
+    });
   }, [step]);
   const barStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%` as unknown as number,
+    width: progress.value * TRACK_W,
   }));
   return (
-    <View style={prog.track}>
+    <View style={[prog.track, { width: TRACK_W }]}>
       <Animated.View style={[prog.fill, barStyle]} />
     </View>
   );
