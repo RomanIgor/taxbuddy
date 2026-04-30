@@ -7,6 +7,7 @@ import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollV
 import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Branch } from "@/types";
+import { TAXbuddyLogo } from "@/components/TAXbuddyLogo";
 
 const branches: { id: Branch; label: string }[] = [
   { id: "it", label: "IT & Software" },
@@ -79,11 +80,14 @@ export default function OnboardingScreen() {
       >
         {step === 1 && (
           <View style={styles.stepContainer}>
+            <View style={[styles.logoHero, { backgroundColor: colors.primary }]}>
+              <TAXbuddyLogo size="xl" showTagline lightMode />
+            </View>
             <Text style={[styles.title, { color: colors.foreground }]}>
-              Willkommen bei TAXbuddy
+              Willkommen!
             </Text>
             <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-              Dein ruhiger Begleiter für Steuern und Finanzen. Wie dürfen wir dich nennen?
+              Dein smarter Steuerbegleiter für Kleinunternehmer. Wie dürfen wir dich nennen?
             </Text>
             <TextInput
               style={[
@@ -202,6 +206,14 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 16,
+  },
+  logoHero: {
+    borderRadius: 24,
+    paddingVertical: 36,
+    paddingHorizontal: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
   title: {
     fontSize: 28,
