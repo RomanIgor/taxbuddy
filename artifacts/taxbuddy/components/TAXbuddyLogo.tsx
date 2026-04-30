@@ -31,7 +31,7 @@ function RaccoonHead({ diameter }: { diameter: number }) {
     <View style={{ width: diameter, height: diameter, overflow: "hidden", borderRadius: diameter / 2 }}>
       <Image
         source={raccoonAsset}
-        style={{ width: imgW, height: imgH, left, top }}
+        style={{ position: "absolute", width: imgW, height: imgH, left, top }}
         resizeMode="stretch"
       />
     </View>
