@@ -33,8 +33,8 @@ import { Branch } from "@/types";
 const { width: W, height: H } = Dimensions.get("window");
 
 const imgThumbs = require("@/assets/images/raccoon_suit_thumbs_nobg.png");
+const imgMascot = require("@/assets/images/raccoon_mascot.png");
 const imgCircle = require("@/assets/images/raccoon_logo_circle.jpeg");
-const imgBadge  = require("@/assets/images/raccoon_suit_badge.jpeg");
 
 const NAVY  = "#0F2B4C";
 const BLUE  = "#0066B3";
@@ -64,20 +64,20 @@ const branches: { id: Branch; label: string }[] = [
 
 /* ══════════════════════════════════════════════
    SLIDE 0 — AUFMERKSAMKEIT
-   "Mehr behalten. Weniger zahlen."
+   Split: text left | big raccoon right
 ══════════════════════════════════════════════ */
 function Slide0() {
   return (
     <View style={[sl.root, { backgroundColor: BLUE, flexDirection: "row" }]}>
-      <Animated.View entering={FadeInLeft.duration(500).springify()} style={sl.left}>
+      <Animated.View entering={FadeInLeft.duration(500).springify()} style={sl.s0Left}>
         <Text style={sl.taxWord}>TAX</Text>
         <Text style={sl.buddyWord}>buddy</Text>
         <View style={sl.divider} />
         <Text style={sl.overline}>STEUERN IM GRIFF</Text>
-        <Text style={sl.sub}>
+        <Text style={sl.s0Sub}>
           Dein smarter{"\n"}Steuer-Buddy fur{"\n"}Kleinunternehmer.
         </Text>
-        <View style={{ gap: 8, marginTop: 20 }}>
+        <View style={{ gap: 7, marginTop: 18 }}>
           {["Probleme aufzeigen", "Risiken verstehen", "Losung prasent.", "Vertrauen aufbauen"].map((item, i) => (
             <Animated.View
               key={item}
@@ -91,10 +91,9 @@ function Slide0() {
         </View>
       </Animated.View>
 
-      <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.right}>
-        <Image source={imgThumbs} style={sl.mascotThumbs} resizeMode="contain" />
+      <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.s0Right}>
+        <Image source={imgThumbs} style={sl.mascotBig} resizeMode="contain" />
       </Animated.View>
-
       <View style={sl.glow} />
     </View>
   );
@@ -103,44 +102,50 @@ function Slide0() {
 /* ══════════════════════════════════════════════
    SLIDE 1 — NUTZEN VERSTEHEN
    "Alles im Blick. Alles an einem Ort."
+   Split: content left | raccoon mascot right
 ══════════════════════════════════════════════ */
 function Slide1() {
-  const features = [
-    { icon: "↑", label: "Einnahmen erfassen", color: GREEN,  val: "21.132 €" },
-    { icon: "↓", label: "Ausgaben tracken",   color: RED,    val:  "5.668 €" },
-    { icon: "→", label: "Fahrtenbuch",         color: BLUE,   val: "0,30/km" },
-    { icon: "✓", label: "Steuer-Check",        color: AMBER,  val: "Tipps" },
-  ];
   return (
-    <View style={[sl.root, { backgroundColor: NAVY }]}>
-      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
-        <Animated.View entering={FadeIn.duration(300).delay(60)} style={sl.circleWrap}>
-          <Image source={imgCircle} style={sl.mascotCircle} resizeMode="cover" />
-        </Animated.View>
-        <Animated.Text entering={FadeInUp.duration(400).delay(130)} style={sl.slideOverline}>
+    <View style={[sl.root, { backgroundColor: NAVY, flexDirection: "row" }]}>
+      {/* Left content */}
+      <Animated.View entering={FadeInLeft.duration(500)} style={sl.s1Left}>
+        <Animated.Text entering={FadeInUp.duration(350).delay(100)} style={sl.overline}>
           NUTZEN VERSTEHEN
         </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(180)} style={sl.slideHeadline}>
-          Alles im Blick.{"\n"}Alles an einem Ort.
+        <Animated.Text entering={FadeInUp.duration(400).delay(160)} style={sl.headlineSm}>
+          Alles im Blick.{"\n"}Alles an{"\n"}einem Ort.
         </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(240)} style={sl.slideSub}>
-          Einnahmen, Ausgaben, Fahrten und Steuertipps — ubersichtlich und automatisch.
+        <Animated.Text entering={FadeInUp.duration(400).delay(220)} style={sl.bodyText}>
+          Einnahmen, Ausgaben, Fahrten und Steuertipps — automatisch.
         </Animated.Text>
-        <View style={sl.featureGrid}>
-          {features.map((f, i) => (
-            <Animated.View
-              key={f.label}
-              entering={FadeInUp.duration(350).delay(300 + i * 60).springify()}
-              style={[sl.featureChip, { borderColor: f.color + "40" }]}
-            >
-              <Text style={[sl.featureIcon, { color: f.color }]}>{f.icon}</Text>
-              <View>
-                <Text style={sl.featureLabel}>{f.label}</Text>
-                <Text style={[sl.featureVal, { color: f.color }]}>{f.val}</Text>
-              </View>
-            </Animated.View>
-          ))}
-        </View>
+
+        {/* Mini dashboard card */}
+        <Animated.View entering={FadeInUp.duration(400).delay(300).springify()} style={sl.miniCard}>
+          <View style={sl.miniRow}>
+            <Text style={sl.miniIcon}>↑</Text>
+            <View>
+              <Text style={sl.miniLabel}>Einnahmen</Text>
+              <Text style={[sl.miniVal, { color: GREEN }]}>21.132 €</Text>
+            </View>
+          </View>
+          <View style={[sl.miniDivider]} />
+          <View style={sl.miniRow}>
+            <Text style={[sl.miniIcon, { color: RED }]}>↓</Text>
+            <View>
+              <Text style={sl.miniLabel}>Ausgaben</Text>
+              <Text style={[sl.miniVal, { color: RED }]}>5.668 €</Text>
+            </View>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInUp.duration(350).delay(400).springify()} style={sl.greenChip}>
+          <Text style={sl.greenChipText}>Steuer-Check aktiv</Text>
+        </Animated.View>
+      </Animated.View>
+
+      {/* Right mascot */}
+      <Animated.View entering={FadeInRight.duration(600).delay(80).springify()} style={sl.s1Right}>
+        <Image source={imgMascot} style={sl.mascotRight} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -149,41 +154,46 @@ function Slide1() {
 /* ══════════════════════════════════════════════
    SLIDE 2 — PROBLEM ANSPRECHEN
    "Kleine Fehler. Grosse Kosten."
+   Top half raccoon, bottom problems list
 ══════════════════════════════════════════════ */
 function Slide2() {
   const problems = [
-    { label: "Steuerfallen ubersehen",    color: RED },
-    { label: "Fristen verspasst",         color: RED },
-    { label: "Zu hohe Steuerlast",        color: AMBER },
-    { label: "Wichtige Tipps verpasst",   color: AMBER },
-    { label: "Geld verschenkt",           color: RED },
+    { label: "Steuerfallen ubersehen",  color: RED },
+    { label: "Fristen verspasst",       color: RED },
+    { label: "Zu hohe Steuerlast",      color: AMBER },
+    { label: "Wichtige Tipps verpasst", color: AMBER },
+    { label: "Geld verschenkt",         color: RED },
   ];
   return (
     <View style={[sl.root, { backgroundColor: NAVY }]}>
-      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
-        <Animated.Text entering={FadeInUp.duration(400).delay(80)} style={sl.slideOverline}>
-          PROBLEM ANSPRECHEN
-        </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(140)} style={sl.slideHeadline}>
-          Kleine Fehler.{"\n"}
-          <Text style={{ color: RED }}>Grosse Kosten.</Text>
-        </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(200)} style={sl.slideSub}>
-          Viele Selbstandige zahlen zu viel Steuern oder verpassen wichtige Fristen.
-        </Animated.Text>
-        <View style={{ gap: 10, marginTop: 8 }}>
-          {problems.map((p, i) => (
-            <Animated.View
-              key={p.label}
-              entering={FadeInLeft.duration(350).delay(280 + i * 70).springify()}
-              style={[sl.problemRow, { borderColor: p.color + "30" }]}
-            >
-              <View style={[sl.problemDot, { backgroundColor: p.color }]} />
-              <Text style={sl.problemLabel}>{p.label}</Text>
-            </Animated.View>
-          ))}
-        </View>
-      </Animated.View>
+      {/* Top: raccoon badge on right, headline on left */}
+      <View style={{ flexDirection: "row", flex: 0.55 }}>
+        <Animated.View entering={FadeInLeft.duration(500)} style={sl.s2TextTop}>
+          <Text style={sl.overline}>PROBLEM ANSPRECHEN</Text>
+          <Text style={sl.headlineSm}>
+            Kleine{"\n"}Fehler.{"\n"}
+            <Text style={{ color: RED }}>Grosse{"\n"}Kosten.</Text>
+          </Text>
+          <Text style={sl.bodyText}>Viele zahlen zu viel Steuern — ohne es zu wissen.</Text>
+        </Animated.View>
+        <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.s2RaccoonWrap}>
+          <Image source={imgMascot} style={sl.mascotSquare} resizeMode="contain" />
+        </Animated.View>
+      </View>
+
+      {/* Bottom: problem list */}
+      <View style={{ flex: 0.45, paddingHorizontal: 24, gap: 8, justifyContent: "flex-start", paddingTop: 4 }}>
+        {problems.map((p, i) => (
+          <Animated.View
+            key={p.label}
+            entering={FadeInLeft.duration(350).delay(260 + i * 65).springify()}
+            style={[sl.problemRow, { borderColor: p.color + "35" }]}
+          >
+            <View style={[sl.problemDot, { backgroundColor: p.color }]} />
+            <Text style={sl.problemLabel}>{p.label}</Text>
+          </Animated.View>
+        ))}
+      </View>
     </View>
   );
 }
@@ -191,42 +201,43 @@ function Slide2() {
 /* ══════════════════════════════════════════════
    SLIDE 3 — LÖSUNG PRÄSENTIEREN
    "TAXbuddy warnt dich rechtzeitig."
+   Split: solutions left | raccoon right
 ══════════════════════════════════════════════ */
 function Slide3() {
   const solutions = [
-    { label: "Fruhwarnung bei Umsatzlimit",   sub: "Sobald du dich 22.000 EUR naherst" },
-    { label: "Sparpotenziale erkennen",        sub: "KI analysiert deine Ausgaben" },
-    { label: "Personliche Steuertipps",        sub: "Passend zu deiner Branche" },
+    { label: "Fruhwarnung bei Umsatzlimit",  sub: "Sobald du 22.000 EUR naherst" },
+    { label: "Sparpotenziale erkennen",       sub: "KI analysiert deine Ausgaben" },
+    { label: "Personliche Steuertipps",       sub: "Passend zu deiner Branche" },
   ];
   return (
-    <View style={[sl.root, { backgroundColor: NAVY }]}>
-      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
-        <Animated.Text entering={FadeInUp.duration(400).delay(80)} style={sl.slideOverline}>
-          LOSUNG PRASENTIEREN
-        </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(140)} style={sl.slideHeadline}>
-          TAXbuddy warnt{"\n"}dich rechtzeitig.
-        </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(200)} style={sl.slideSub}>
-          Bevor es teuer wird.
-        </Animated.Text>
-        <View style={{ gap: 12, marginTop: 8 }}>
-          {solutions.map((s, i) => (
-            <Animated.View
-              key={s.label}
-              entering={FadeInUp.duration(350).delay(280 + i * 80).springify()}
-              style={sl.solutionRow}
-            >
-              <View style={sl.checkCircle}>
-                <Text style={sl.checkMark}>✓</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={sl.solutionLabel}>{s.label}</Text>
-                <Text style={sl.solutionSub}>{s.sub}</Text>
-              </View>
-            </Animated.View>
-          ))}
-        </View>
+    <View style={[sl.root, { backgroundColor: NAVY, flexDirection: "row" }]}>
+      {/* Left */}
+      <Animated.View entering={FadeInLeft.duration(500)} style={sl.s3Left}>
+        <Text style={sl.overline}>LOSUNG PRASENTIEREN</Text>
+        <Text style={sl.headlineSm}>
+          TAXbuddy{"\n"}warnt dich{"\n"}rechtzeitig.
+        </Text>
+        <Text style={[sl.bodyText, { marginBottom: 10 }]}>Bevor es teuer wird.</Text>
+        {solutions.map((s, i) => (
+          <Animated.View
+            key={s.label}
+            entering={FadeInUp.duration(350).delay(280 + i * 80).springify()}
+            style={sl.solutionRow}
+          >
+            <View style={sl.checkCircle}>
+              <Text style={sl.checkMark}>✓</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={sl.solutionLabel}>{s.label}</Text>
+              <Text style={sl.solutionSub}>{s.sub}</Text>
+            </View>
+          </Animated.View>
+        ))}
+      </Animated.View>
+
+      {/* Right raccoon */}
+      <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.s3Right}>
+        <Image source={imgThumbs} style={sl.mascotRight} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -235,14 +246,15 @@ function Slide3() {
 /* ══════════════════════════════════════════════
    SLIDE 4 — SOFORT ZEIGEN
    "In 60 Sekunden startklar."
+   Timer left | raccoon right
 ══════════════════════════════════════════════ */
 function Slide4() {
   const pulse = useSharedValue(1);
   useEffect(() => {
     pulse.value = withRepeat(
       withSequence(
-        withTiming(1.08, { duration: 900, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1.00, { duration: 900, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1.1, { duration: 900, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1.0, { duration: 900, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
       false,
@@ -251,33 +263,36 @@ function Slide4() {
   const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
   return (
-    <View style={[sl.root, { backgroundColor: NAVY }]}>
-      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
-        <Animated.Text entering={FadeInUp.duration(400).delay(80)} style={sl.slideOverline}>
-          SOFORT ZEIGEN
-        </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(140)} style={sl.slideHeadline}>
-          In 60 Sekunden{"\n"}startklar.
-        </Animated.Text>
+    <View style={[sl.root, { backgroundColor: NAVY, flexDirection: "row" }]}>
+      {/* Left: timer + text */}
+      <Animated.View entering={FadeInLeft.duration(500)} style={sl.s4Left}>
+        <Text style={sl.overline}>SOFORT ZEIGEN</Text>
+        <Text style={sl.headlineSm}>In 60{"\n"}Sekunden{"\n"}startklar.</Text>
 
-        <Animated.View entering={FadeIn.duration(500).delay(220)}>
-          <Animated.View style={[sl.timerRing, pulseStyle]}>
-            <Text style={sl.timerNum}>60</Text>
-            <Text style={sl.timerSec}>Sek.</Text>
-          </Animated.View>
+        <Animated.View style={[sl.timerRing, pulseStyle]}>
+          <Text style={sl.timerNum}>60</Text>
+          <Text style={sl.timerSec}>Sek.</Text>
         </Animated.View>
 
-        <Animated.Text entering={FadeInUp.duration(400).delay(340)} style={sl.slideSub}>
-          Erste Auswertung in weniger als einer Minute — kostenlos und unverbindlich.
-        </Animated.Text>
-        <Animated.View entering={FadeInUp.duration(400).delay(420)} style={sl.steps3Row}>
+        <Text style={sl.bodyText}>Erste Auswertung in weniger als einer Minute — kostenlos.</Text>
+
+        <View style={{ gap: 8, marginTop: 6 }}>
           {["Angaben eingeben", "Analyse starten", "Ergebnis erhalten"].map((s, i) => (
-            <View key={s} style={sl.step3Item}>
+            <Animated.View
+              key={s}
+              entering={FadeInLeft.duration(300).delay(320 + i * 70).springify()}
+              style={sl.step3Item}
+            >
               <View style={sl.step3Num}><Text style={sl.step3NumText}>{i + 1}</Text></View>
               <Text style={sl.step3Label}>{s}</Text>
-            </View>
+            </Animated.View>
           ))}
-        </Animated.View>
+        </View>
+      </Animated.View>
+
+      {/* Right: raccoon */}
+      <Animated.View entering={FadeInRight.duration(600).delay(120).springify()} style={sl.s4Right}>
+        <Image source={imgMascot} style={sl.mascotRight} resizeMode="contain" />
       </Animated.View>
     </View>
   );
@@ -286,52 +301,59 @@ function Slide4() {
 /* ══════════════════════════════════════════════
    SLIDE 5 — HANDLUNG & VERTRAUEN
    "Kostenlos starten. Jederzeit upgraden."
+   Circle portrait top | pricing cards below
 ══════════════════════════════════════════════ */
 function Slide5() {
   const freeFeatures    = ["Basis-Ubersicht", "Einnahmen & Ausgaben", "Top-Steuertipp"];
   const premiumFeatures = ["Unbegrenzte Eintrage", "KI-Assistent", "Steuer-Check & Export"];
   return (
     <View style={[sl.root, { backgroundColor: NAVY }]}>
-      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
-        <Animated.View entering={FadeIn.duration(350).delay(60)} style={sl.circleWrap}>
-          <Image source={imgBadge} style={sl.mascotCircle} resizeMode="cover" />
+      {/* Top: raccoon portrait + headline side by side */}
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 28, paddingTop: 32, gap: 20, flex: 0.40 }}>
+        <Animated.View entering={FadeIn.duration(400).delay(60)} style={sl.portraitWrap}>
+          <Image source={imgCircle} style={sl.portraitImg} resizeMode="cover" />
         </Animated.View>
-        <Animated.Text entering={FadeInUp.duration(400).delay(120)} style={sl.slideOverline}>
-          HANDLUNG & VERTRAUEN
-        </Animated.Text>
-        <Animated.Text entering={FadeInUp.duration(400).delay(180)} style={sl.slideHeadline}>
-          Kostenlos starten.{"\n"}Jederzeit upgraden.
-        </Animated.Text>
-
-        <Animated.View entering={FadeInUp.duration(500).delay(270).springify()} style={sl.pricingRow}>
-          {/* Free tier */}
-          <View style={[sl.pricingCard, { borderColor: "rgba(255,255,255,0.15)" }]}>
-            <Text style={sl.pricingTier}>Kostenlos</Text>
-            <Text style={sl.pricingPrice}>0 €</Text>
-            {freeFeatures.map((f) => (
-              <View key={f} style={sl.pricingFeature}>
-                <Text style={[sl.checkMark, { fontSize: 11, color: GREEN }]}>✓</Text>
-                <Text style={sl.pricingFeatureText}>{f}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Premium tier */}
-          <View style={[sl.pricingCard, { borderColor: GREEN, backgroundColor: "rgba(61,181,74,0.08)" }]}>
-            <View style={sl.premiumBadge}><Text style={sl.premiumBadgeText}>Premium</Text></View>
-            <Text style={sl.pricingTier}>Premium</Text>
-            <Text style={[sl.pricingPrice, { color: GREEN }]}>
-              ab 2,99 €
-              <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>/Monat</Text>
-            </Text>
-            {premiumFeatures.map((f) => (
-              <View key={f} style={sl.pricingFeature}>
-                <Text style={[sl.checkMark, { fontSize: 11, color: GREEN }]}>✓</Text>
-                <Text style={sl.pricingFeatureText}>{f}</Text>
-              </View>
-            ))}
-          </View>
+        <Animated.View entering={FadeInRight.duration(400).delay(120)} style={{ flex: 1 }}>
+          <Text style={sl.overline}>HANDLUNG & VERTRAUEN</Text>
+          <Text style={[sl.headlineSm, { fontSize: 20, lineHeight: 26 }]}>
+            Kostenlos{"\n"}starten.{"\n"}
+            <Text style={{ color: GREEN }}>Jederzeit{"\n"}upgraden.</Text>
+          </Text>
         </Animated.View>
+      </View>
+
+      {/* Pricing cards */}
+      <Animated.View
+        entering={FadeInUp.duration(500).delay(260).springify()}
+        style={sl.pricingRow}
+      >
+        {/* Free */}
+        <View style={[sl.pricingCard, { borderColor: "rgba(255,255,255,0.15)" }]}>
+          <Text style={sl.pricingTier}>Kostenlos</Text>
+          <Text style={sl.pricingPrice}>0 €</Text>
+          {freeFeatures.map((f) => (
+            <View key={f} style={sl.pricingFeature}>
+              <Text style={[sl.checkMark, { fontSize: 11, color: GREEN }]}>✓</Text>
+              <Text style={sl.pricingFeatureText}>{f}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Premium */}
+        <View style={[sl.pricingCard, { borderColor: GREEN, backgroundColor: "rgba(61,181,74,0.08)" }]}>
+          <View style={sl.premiumBadge}><Text style={sl.premiumBadgeText}>Premium</Text></View>
+          <Text style={sl.pricingTier}>Premium</Text>
+          <Text style={[sl.pricingPrice, { color: GREEN }]}>
+            ab 2,99 €
+            <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>/Monat</Text>
+          </Text>
+          {premiumFeatures.map((f) => (
+            <View key={f} style={sl.pricingFeature}>
+              <Text style={[sl.checkMark, { fontSize: 11, color: GREEN }]}>✓</Text>
+              <Text style={sl.pricingFeatureText}>{f}</Text>
+            </View>
+          ))}
+        </View>
       </Animated.View>
     </View>
   );
@@ -423,7 +445,6 @@ export default function OnboardingScreen() {
 
         {/* Bottom controls */}
         <View style={[ctrl.container, { paddingBottom: insets.bottom + 24 }]}>
-          {/* Dots */}
           <View style={ctrl.dots}>
             {SLIDES.map((_, i) => (
               <View
@@ -435,8 +456,6 @@ export default function OnboardingScreen() {
               />
             ))}
           </View>
-
-          {/* Buttons */}
           <View style={ctrl.row}>
             {slideIdx > 0 ? (
               <Pressable onPress={goBack} style={ctrl.backBtn}>
@@ -447,7 +466,6 @@ export default function OnboardingScreen() {
                 <Text style={ctrl.backText}>Uberspringen</Text>
               </Pressable>
             )}
-
             <Animated.View style={[ctrl.nextWrap, btnStyle]}>
               <Pressable
                 onPress={goNext}
@@ -493,7 +511,6 @@ export default function OnboardingScreen() {
               </View>
               <Image source={imgThumbs} style={styles.heroImg} resizeMode="contain" />
             </Animated.View>
-
             <Animated.Text entering={FadeInDown.duration(350).delay(80)} style={[styles.title, { color: colors.foreground }]}>
               Willkommen!
             </Animated.Text>
@@ -600,76 +617,88 @@ export default function OnboardingScreen() {
 }
 
 /* ══════════════════════════════════════════════
-   STYLES — Slide internals
+   STYLES
 ══════════════════════════════════════════════ */
+const MASCOT_H = H * 0.58;
+const MASCOT_HALF_H = H * 0.50;
+
 const sl = StyleSheet.create({
-  root:          { flex: 1 },
-  glow:          { position: "absolute", bottom: -60, left: -40, width: W * 1.2, height: 180, borderRadius: 999, backgroundColor: "rgba(61,181,74,0.08)" },
+  root: { flex: 1 },
+  glow: { position: "absolute", bottom: -60, left: -40, width: W * 1.2, height: 180, borderRadius: 999, backgroundColor: "rgba(61,181,74,0.07)" },
 
-  /* Slide 0 */
-  left:          { flex: 1, justifyContent: "flex-end", paddingLeft: 28, paddingBottom: 60, gap: 2, zIndex: 2 },
-  right:         { width: W * 0.50, alignItems: "flex-end", justifyContent: "flex-end" },
-  taxWord:       { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 52, letterSpacing: -2, lineHeight: 54 },
-  buddyWord:     { color: GREEN,  fontFamily: "Inter_400Regular",   fontSize: 52, letterSpacing: -2, lineHeight: 56, marginBottom: 12 },
-  divider:       { width: 40, height: 2, backgroundColor: "rgba(255,255,255,0.3)", marginBottom: 10 },
-  overline:      { color: "rgba(255,255,255,0.55)", fontFamily: "Inter_600SemiBold", fontSize: 10, letterSpacing: 2.8, marginBottom: 14 },
-  sub:           { color: "rgba(255,255,255,0.80)", fontFamily: "Inter_500Medium", fontSize: 14, lineHeight: 20 },
-  mascotThumbs:  { width: W * 0.52, height: H * 0.60 },
-  bullet:        { flexDirection: "row", alignItems: "center", gap: 8 },
-  bulletDot:     { width: 6, height: 6, borderRadius: 3, backgroundColor: GREEN },
-  bulletText:    { color: "rgba(255,255,255,0.75)", fontFamily: "Inter_500Medium", fontSize: 12 },
+  /* ── Slide 0 ── */
+  s0Left:      { flex: 1, justifyContent: "flex-end", paddingLeft: 28, paddingBottom: 70, gap: 2, zIndex: 2 },
+  s0Right:     { width: W * 0.50, alignItems: "flex-end", justifyContent: "flex-end" },
+  taxWord:     { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 50, letterSpacing: -2, lineHeight: 52 },
+  buddyWord:   { color: GREEN,  fontFamily: "Inter_400Regular",   fontSize: 50, letterSpacing: -2, lineHeight: 54, marginBottom: 10 },
+  divider:     { width: 36, height: 2, backgroundColor: "rgba(255,255,255,0.3)", marginBottom: 8 },
+  overline:    { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 2.2, marginBottom: 6 },
+  s0Sub:       { color: "rgba(255,255,255,0.80)", fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 19 },
+  mascotBig:   { width: W * 0.52, height: MASCOT_H },
+  bullet:      { flexDirection: "row", alignItems: "center", gap: 8 },
+  bulletDot:   { width: 5, height: 5, borderRadius: 3, backgroundColor: GREEN },
+  bulletText:  { color: "rgba(255,255,255,0.72)", fontFamily: "Inter_500Medium", fontSize: 12 },
 
-  /* Slides 1–5 shared */
-  centerContent: { flex: 1, alignItems: "flex-start", justifyContent: "center", paddingHorizontal: 32, gap: 14 },
-  circleWrap:    { width: 72, height: 72, borderRadius: 36, overflow: "hidden", borderWidth: 3, borderColor: GREEN },
-  mascotCircle:  { width: 72, height: 72 },
-  slideOverline: { color: "rgba(255,255,255,0.4)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 1.8 },
-  slideHeadline: { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 26, lineHeight: 32 },
-  slideSub:      { color: "rgba(255,255,255,0.65)", fontFamily: "Inter_500Medium", fontSize: 14, lineHeight: 21 },
+  /* ── Slide 1 ── */
+  s1Left:      { flex: 1, justifyContent: "center", paddingLeft: 26, paddingBottom: 20, gap: 12 },
+  s1Right:     { width: W * 0.46, alignItems: "flex-end", justifyContent: "flex-end" },
+  mascotRight: { width: W * 0.48, height: MASCOT_HALF_H },
+  miniCard:    { backgroundColor: "rgba(255,255,255,0.07)", borderRadius: 14, padding: 12, borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", gap: 8 },
+  miniRow:     { flexDirection: "row", alignItems: "center", gap: 10 },
+  miniIcon:    { color: GREEN, fontFamily: "Inter_800ExtraBold", fontSize: 18, width: 22, textAlign: "center" },
+  miniLabel:   { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_500Medium", fontSize: 11 },
+  miniVal:     { fontFamily: "Inter_700Bold", fontSize: 15 },
+  miniDivider: { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
+  greenChip:   { alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 },
+  greenChipText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 11 },
 
-  /* Slide 1 */
-  featureGrid:   { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 4 },
-  featureChip:   { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: "rgba(255,255,255,0.06)", minWidth: "44%" },
-  featureIcon:   { fontFamily: "Inter_700Bold", fontSize: 16 },
-  featureLabel:  { color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 12 },
-  featureVal:    { fontFamily: "Inter_700Bold", fontSize: 13 },
+  /* ── Slide 2 ── */
+  s2TextTop:   { flex: 1, justifyContent: "flex-end", paddingLeft: 26, paddingBottom: 12, gap: 6 },
+  s2RaccoonWrap: { width: W * 0.44, justifyContent: "flex-end", alignItems: "flex-end" },
+  mascotSquare: { width: W * 0.42, height: W * 0.52, borderRadius: 0 },
+  problemRow:  { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
+  problemDot:  { width: 7, height: 7, borderRadius: 4 },
+  problemLabel: { color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 13 },
 
-  /* Slide 2 */
-  problemRow:    { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
-  problemDot:    { width: 8, height: 8, borderRadius: 4 },
-  problemLabel:  { color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 14 },
+  /* ── Slide 3 ── */
+  s3Left:      { flex: 1, justifyContent: "center", paddingLeft: 26, paddingBottom: 20, gap: 10 },
+  s3Right:     { width: W * 0.46, alignItems: "flex-end", justifyContent: "flex-end" },
+  solutionRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(61,181,74,0.28)", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
+  checkCircle: { width: 24, height: 24, borderRadius: 12, backgroundColor: GREEN, alignItems: "center", justifyContent: "center", marginTop: 1 },
+  checkMark:   { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 12 },
+  solutionLabel: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13, lineHeight: 17 },
+  solutionSub:   { color: "rgba(255,255,255,0.48)", fontFamily: "Inter_500Medium", fontSize: 11, marginTop: 2 },
 
-  /* Slide 3 */
-  solutionRow:   { flexDirection: "row", alignItems: "flex-start", gap: 12, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(61,181,74,0.25)", borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
-  checkCircle:   { width: 26, height: 26, borderRadius: 13, backgroundColor: GREEN, alignItems: "center", justifyContent: "center" },
-  checkMark:     { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 13 },
-  solutionLabel: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 14, lineHeight: 18 },
-  solutionSub:   { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_500Medium", fontSize: 12, marginTop: 2 },
+  /* ── Slide 4 ── */
+  s4Left:      { flex: 1, justifyContent: "center", paddingLeft: 26, paddingBottom: 20, gap: 12 },
+  s4Right:     { width: W * 0.44, alignItems: "flex-end", justifyContent: "flex-end" },
+  timerRing:   { width: 90, height: 90, borderRadius: 45, borderWidth: 4, borderColor: GREEN, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(61,181,74,0.10)" },
+  timerNum:    { color: GREEN, fontFamily: "Inter_800ExtraBold", fontSize: 32, lineHeight: 34 },
+  timerSec:    { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 10 },
+  step3Item:   { flexDirection: "row", alignItems: "center", gap: 10 },
+  step3Num:    { width: 26, height: 26, borderRadius: 13, backgroundColor: BLUE, alignItems: "center", justifyContent: "center" },
+  step3NumText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13 },
+  step3Label:  { color: "rgba(255,255,255,0.65)", fontFamily: "Inter_500Medium", fontSize: 12 },
 
-  /* Slide 4 */
-  timerRing:     { width: 110, height: 110, borderRadius: 55, borderWidth: 4, borderColor: GREEN, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(61,181,74,0.1)", alignSelf: "flex-start" },
-  timerNum:      { color: GREEN, fontFamily: "Inter_800ExtraBold", fontSize: 38, lineHeight: 40 },
-  timerSec:      { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_600SemiBold", fontSize: 11 },
-  steps3Row:     { flexDirection: "row", gap: 10, marginTop: 4, flexWrap: "wrap" },
-  step3Item:     { alignItems: "center", gap: 6, flex: 1, minWidth: 80 },
-  step3Num:      { width: 30, height: 30, borderRadius: 15, backgroundColor: BLUE, alignItems: "center", justifyContent: "center" },
-  step3NumText:  { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 14 },
-  step3Label:    { color: "rgba(255,255,255,0.65)", fontFamily: "Inter_500Medium", fontSize: 11, textAlign: "center" },
-
-  /* Slide 5 */
-  pricingRow:       { flexDirection: "row", gap: 10, width: "100%" },
-  pricingCard:      { flex: 1, borderWidth: 1, borderRadius: 16, padding: 14, gap: 8, backgroundColor: "rgba(255,255,255,0.04)" },
-  pricingTier:      { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_600SemiBold", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase" },
-  pricingPrice:     { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 22, lineHeight: 26 },
-  pricingFeature:   { flexDirection: "row", alignItems: "center", gap: 6 },
-  pricingFeatureText: { color: "rgba(255,255,255,0.7)", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1 },
+  /* ── Slide 5 ── */
+  portraitWrap: { width: 90, height: 90, borderRadius: 45, overflow: "hidden", borderWidth: 3, borderColor: GREEN },
+  portraitImg:  { width: 90, height: 90 },
+  pricingRow:   { flexDirection: "row", gap: 10, paddingHorizontal: 20, flex: 0.58, alignItems: "flex-start" },
+  pricingCard:  { flex: 1, borderWidth: 1, borderRadius: 16, padding: 14, gap: 8, backgroundColor: "rgba(255,255,255,0.04)" },
+  pricingTier:  { color: "rgba(255,255,255,0.45)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase" },
+  pricingPrice: { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 20, lineHeight: 24 },
+  pricingFeature:     { flexDirection: "row", alignItems: "center", gap: 6 },
+  pricingFeatureText: { color: "rgba(255,255,255,0.68)", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1 },
   premiumBadge:     { alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, marginBottom: 2 },
   premiumBadgeText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 0.5 },
+
+  /* ── Shared ── */
+  headlineSm: { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 22, lineHeight: 28 },
+  bodyText:   { color: "rgba(255,255,255,0.62)", fontFamily: "Inter_500Medium", fontSize: 13, lineHeight: 19 },
 });
 
-/* ── Controls (intro bottom) ── */
 const ctrl = StyleSheet.create({
-  container: { paddingHorizontal: 28, gap: 16, paddingTop: 12 },
+  container: { paddingHorizontal: 28, gap: 16, paddingTop: 10 },
   dots:      { flexDirection: "row", justifyContent: "center", gap: 6, alignItems: "center" },
   dot:       { height: 8, borderRadius: 4 },
   row:       { flexDirection: "row", alignItems: "center", gap: 12 },
@@ -680,13 +709,11 @@ const ctrl = StyleSheet.create({
   nextText:  { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 16 },
 });
 
-/* ── Progress bar (setup) ── */
 const prog = StyleSheet.create({
   track: { height: 4, borderRadius: 2, backgroundColor: "rgba(0,0,0,0.08)", overflow: "hidden" },
   fill:  { height: 4, borderRadius: 2, backgroundColor: BLUE },
 });
 
-/* ── Setup steps ── */
 const styles = StyleSheet.create({
   root:      { flex: 1 },
   topBar:    { paddingHorizontal: 24, paddingBottom: 8, gap: 8 },
