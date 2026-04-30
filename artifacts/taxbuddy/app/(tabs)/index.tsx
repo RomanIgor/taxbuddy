@@ -11,11 +11,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
 } from "react-native-reanimated";
 
 import { useColors } from "@/hooks/useColors";
@@ -26,80 +26,86 @@ import { useTrips } from "@/contexts/TripsContext";
 import { formatCurrency } from "@/utils/format";
 import { LEGAL } from "@/constants/legal";
 
+const SUCCESS_COLOR  = "#16A34A";
+const SUCCESS_BG     = "#DCFCE7";
+const WARNING_COLOR  = "#D97706";
+const WARNING_BG     = "#FEF3C7";
+const PRIMARY_BG     = "#DBEAFE";
+const PURPLE_COLOR   = "#7C3AED";
+const PURPLE_BG      = "#EDE9FE";
+const TEAL_COLOR     = "#0D9488";
+const TEAL_BG        = "#CCFBF1";
+const INDIGO_COLOR   = "#4F46E5";
+const INDIGO_BG      = "#E0E7FF";
+const SKY_COLOR      = "#0284C7";
+const SKY_BG         = "#E0F2FE";
+
 type QuickAction = {
   key: string;
   label: string;
-  icon: React.ComponentProps<typeof Feather>["name"];
+  iconSet: "feather" | "mci";
+  icon: string;
+  iconColor: string;
+  iconBg: string;
   href: string;
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { key: "income", label: "Einnahme", icon: "trending-up", href: "/income/new" },
-  { key: "expense", label: "Ausgabe", icon: "shopping-bag", href: "/expense/new" },
-  { key: "trip", label: "Fahrt", icon: "map-pin", href: "/trip/new" },
-  { key: "ai", label: "KI fragen", icon: "message-circle", href: "/ai" },
-  { key: "invoice", label: "Beleg-Check", icon: "camera", href: "/invoice-check" },
-  { key: "simulation", label: "Simulation", icon: "sliders", href: "/simulation" },
-  { key: "forecast", label: "Prognose", icon: "trending-up", href: "/forecast" },
-  { key: "export", label: "Export", icon: "share", href: "/export" },
+  { key: "income",     label: "Einnahme",   iconSet: "feather", icon: "arrow-up",     iconColor: SUCCESS_COLOR, iconBg: SUCCESS_BG,  href: "/income/new" },
+  { key: "expense",    label: "Ausgabe",    iconSet: "feather", icon: "arrow-down",   iconColor: WARNING_COLOR, iconBg: WARNING_BG,  href: "/expense/new" },
+  { key: "trip",       label: "Fahrt",      iconSet: "mci",     icon: "car",          iconColor: "#0066B3",     iconBg: PRIMARY_BG,  href: "/trip/new" },
+  { key: "ai",         label: "KI",         iconSet: "feather", icon: "zap",          iconColor: PURPLE_COLOR,  iconBg: PURPLE_BG,   href: "/ai" },
+  { key: "invoice",    label: "Beleg",      iconSet: "feather", icon: "file-text",    iconColor: TEAL_COLOR,    iconBg: TEAL_BG,     href: "/invoice-check" },
+  { key: "simulation", label: "Simulation", iconSet: "feather", icon: "sliders",      iconColor: INDIGO_COLOR,  iconBg: INDIGO_BG,   href: "/simulation" },
+  { key: "forecast",   label: "Prognose",   iconSet: "feather", icon: "trending-up",  iconColor: "#0066B3",     iconBg: PRIMARY_BG,  href: "/forecast" },
+  { key: "export",     label: "Export",     iconSet: "feather", icon: "upload",       iconColor: SKY_COLOR,     iconBg: SKY_BG,      href: "/export" },
 ];
 
 function statusFor(percent: number) {
-  if (percent < 60) return { tone: "success", label: "Sicher im grünen Bereich" };
-  if (percent < 80) return { tone: "warning", label: "Im Auge behalten" };
-  if (percent < 100) return { tone: "warning", label: "Achtung – Grenze nähert sich" };
-  return { tone: "critical", label: "Grenze überschritten" };
+  if (percent < 60) return { tone: "success", label: `Sicher — ${percent.toFixed(0)} %` };
+  if (percent < 80) return { tone: "warning", label: `Im Auge behalten — ${percent.toFixed(0)} %` };
+  if (percent < 100) return { tone: "warning", label: `Achtung — ${percent.toFixed(0)} %` };
+  return { tone: "critical", label: `Grenze überschritten` };
 }
 
 export default function DashboardScreen() {
-  const colors = useColors();
-  const insets = useSafeAreaInsets();
+  const colors  = useColors();
+  const insets  = useSafeAreaInsets();
   const { profile } = useProfile();
   const { incomes, ytdRevenue } = useIncomes();
   const { expenses } = useExpenses();
   const { trips } = useTrips();
 
-  const limit = LEGAL.kleinunternehmerVorjahr;
-  const percent = Math.min(100, (ytdRevenue / limit) * 100);
-  const status = statusFor(percent);
+  const limit     = LEGAL.kleinunternehmerVorjahr;
+  const percent   = Math.min(100, (ytdRevenue / limit) * 100);
+  const status    = statusFor(percent);
   const remaining = Math.max(0, limit - ytdRevenue);
 
   const tripKm = useMemo(
-    () =>
-      trips.reduce(
-        (sum, t) => sum + t.km * (t.roundTrip ? 2 : 1),
-        0,
-      ),
+    () => trips.reduce((sum, t) => sum + t.km * (t.roundTrip ? 2 : 1), 0),
     [trips],
   );
   const tripPauschale = tripKm * LEGAL.kilometerpauschale;
-  const expenseSum = useMemo(
-    () => expenses.reduce((s, e) => s + e.amount, 0),
-    [expenses],
-  );
-
+  const expenseSum    = useMemo(() => expenses.reduce((s, e) => s + e.amount, 0), [expenses]);
   const monthsElapsed = new Date().getMonth() + 1;
-  const projected = monthsElapsed > 0 ? (ytdRevenue / monthsElapsed) * 12 : 0;
-  const forecastStatus = statusFor((projected / limit) * 100);
+  const projected     = monthsElapsed > 0 ? (ytdRevenue / monthsElapsed) * 12 : 0;
 
   const progress = useSharedValue(0);
-  const numberValue = useSharedValue(0);
-
   useEffect(() => {
     progress.value = withTiming(percent / 100, { duration: 900 });
-    numberValue.value = withSpring(ytdRevenue, { damping: 15 });
-  }, [percent, ytdRevenue, progress, numberValue]);
-
-  const progressStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%`,
-  }));
+  }, [percent, progress]);
+  const progressStyle = useAnimatedStyle(() => ({ width: `${progress.value * 100}%` as any }));
 
   const toneColor = (tone: string) =>
-    tone === "success"
-      ? colors.success
-      : tone === "warning"
-        ? colors.warning
-        : colors.critical;
+    tone === "success" ? SUCCESS_COLOR : tone === "warning" ? WARNING_COLOR : colors.critical;
+
+  const statusBgColor = (tone: string) =>
+    tone === "success" ? SUCCESS_BG : tone === "warning" ? WARNING_BG : "#FEE2E2";
+
+  const statusTextColor = (tone: string) =>
+    tone === "success" ? "#15803D" : tone === "warning" ? "#92400E" : "#991B1B";
+
+  const isWeb = Platform.OS === "web";
 
   return (
     <ScrollView
@@ -107,17 +113,16 @@ export default function DashboardScreen() {
       contentContainerStyle={[
         styles.content,
         {
-          paddingBottom: 120 + (Platform.OS === "web" ? 84 : insets.bottom),
-          paddingTop: Platform.OS === "web" ? 80 : 8,
+          paddingBottom: 120 + (isWeb ? 84 : insets.bottom),
+          paddingTop: isWeb ? 80 : 8,
         },
       ]}
       showsVerticalScrollIndicator={false}
     >
+      {/* ── Greeting row ─────────────────────────────────── */}
       <View style={styles.greetingRow}>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.greetingHello, { color: colors.mutedForeground }]}>
-            Guten Tag
-          </Text>
+          <Text style={[styles.greetingHello, { color: colors.mutedForeground }]}>Guten Tag</Text>
           <Text style={[styles.greetingName, { color: colors.foreground }]}>
             {profile?.name ?? "TAXbuddy"}
           </Text>
@@ -126,235 +131,157 @@ export default function DashboardScreen() {
           accessibilityLabel="Profil"
           onPress={() => router.push("/profile")}
           style={({ pressed }) => [
-            styles.profileButton,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              opacity: pressed ? 0.7 : 1,
-            },
+            styles.headerBtn,
+            { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Feather name="user" size={20} color={colors.foreground} />
+          <Feather name="user" size={19} color={colors.foreground} />
         </Pressable>
       </View>
 
-      <View
-        style={[
-          styles.heroCard,
-          { backgroundColor: colors.primary, borderRadius: colors.radius },
-        ]}
-      >
-        <View style={styles.heroTopRow}>
-          <Text style={[styles.heroLabel, { color: "#cfe6ff" }]}>
-            Umsatz {new Date().getFullYear()}
+      {/* ── §19 Progress banner ───────────────────────────── */}
+      <View style={[styles.progressCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.progressCardTop}>
+          <Text style={[styles.progressCardLabel, { color: colors.mutedForeground }]}>
+            § 19 UStG Jahresgrenze
           </Text>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: "rgba(255,255,255,0.18)" },
-            ]}
-          >
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: toneColor(status.tone) },
-              ]}
-            />
-            <Text style={styles.statusLabel}>{status.label}</Text>
+          <View style={[styles.statusPill, { backgroundColor: statusBgColor(status.tone) }]}>
+            <Text style={[styles.statusPillText, { color: statusTextColor(status.tone) }]}>
+              {status.label}
+            </Text>
           </View>
         </View>
-
-        <Text style={styles.heroAmount}>{formatCurrency(ytdRevenue)}</Text>
-        <Text style={[styles.heroSubLabel, { color: "#cfe6ff" }]}>
-          von {formatCurrency(limit)} Kleinunternehmergrenze (§ 19 UStG)
-        </Text>
-
-        <View style={styles.progressTrack}>
+        <View style={[styles.progressTrack, { backgroundColor: colors.muted }]}>
           <Animated.View
-            style={[
-              styles.progressFill,
-              progressStyle,
-              { backgroundColor: toneColor(status.tone) },
-            ]}
+            style={[styles.progressFill, progressStyle, { backgroundColor: toneColor(status.tone) }]}
           />
         </View>
-
-        <View style={styles.heroFooter}>
-          <View>
-            <Text style={[styles.heroMicroLabel, { color: "#cfe6ff" }]}>
-              Spielraum
-            </Text>
-            <Text style={styles.heroMicroValue}>{formatCurrency(remaining)}</Text>
-          </View>
-          <View>
-            <Text style={[styles.heroMicroLabel, { color: "#cfe6ff" }]}>
-              Auslastung
-            </Text>
-            <Text style={styles.heroMicroValue}>
-              {percent.toFixed(0).replace(".", ",")} %
-            </Text>
-          </View>
+        <View style={styles.progressCardBottom}>
+          <Text style={[styles.progressNote, { color: colors.mutedForeground }]}>
+            {formatCurrency(ytdRevenue)} verwendet
+          </Text>
+          <Text style={[styles.progressNote, { color: toneColor(status.tone), fontFamily: "Inter_600SemiBold" }]}>
+            {formatCurrency(remaining)} frei
+          </Text>
         </View>
       </View>
 
-      <View style={styles.kpiRow}>
-        <KpiCard
-          label="Prognose Jahresende"
-          value={formatCurrency(projected)}
-          tone={forecastStatus.tone}
-          icon="trending-up"
-          onPress={() => router.push("/forecast")}
-        />
-        <KpiCard
-          label="Fahrtenbuch"
-          value={formatCurrency(tripPauschale)}
-          subtitle={`${tripKm.toLocaleString("de-DE")} km`}
-          icon="navigation"
-          onPress={() => router.push("/(tabs)/bookings")}
-        />
-      </View>
+      {/* ── Hero balance card ─────────────────────────────── */}
+      <View style={[styles.heroCard, { borderRadius: colors.radius }]}>
+        {/* decorative orbs */}
+        <View style={styles.heroOrb1} />
+        <View style={styles.heroOrb2} />
 
-      <View
-        style={[
-          styles.summaryCard,
-          {
-            backgroundColor: colors.card,
-            borderColor: colors.border,
-            borderRadius: colors.radius,
-          },
-        ]}
-      >
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: colors.mutedForeground }]}>
-              Einnahmen
-            </Text>
-            <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-              {incomes.length}
+        <Text style={styles.heroLabel}>JAHRESUMSATZ {new Date().getFullYear()}</Text>
+        <Text style={styles.heroAmount}>{formatCurrency(ytdRevenue)}</Text>
+        <View style={styles.heroDivider} />
+        <View style={styles.heroFooter}>
+          <View>
+            <Text style={styles.heroFooterLabel}>Prognose Jahresende</Text>
+            <Text style={[styles.heroFooterValue, { color: WARNING_COLOR }]}>
+              {formatCurrency(projected)}
             </Text>
           </View>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: colors.mutedForeground }]}>
-              Ausgaben
-            </Text>
-            <Text style={[styles.summaryValue, { color: colors.foreground }]}>
+          <View>
+            <Text style={styles.heroFooterLabel}>Absetzbare Ausgaben</Text>
+            <Text style={[styles.heroFooterValue, { color: "rgba(207,230,255,0.85)" }]}>
               {formatCurrency(expenseSum)}
             </Text>
           </View>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: colors.mutedForeground }]}>
-              Fahrten
-            </Text>
-            <Text style={[styles.summaryValue, { color: colors.foreground }]}>
-              {trips.length}
-            </Text>
-          </View>
         </View>
       </View>
 
-      <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-        Schnellaktionen
-      </Text>
+      {/* ── Stat cards ───────────────────────────────────── */}
+      <View style={styles.statRow}>
+        <Pressable
+          onPress={() => router.push("/(tabs)/bookings")}
+          style={({ pressed }) => [
+            styles.statCard,
+            { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius, opacity: pressed ? 0.75 : 1 },
+          ]}
+        >
+          <MaterialCommunityIcons name="car" size={20} color={colors.primary} style={{ marginBottom: 6 }} />
+          <Text style={[styles.statValue, { color: colors.foreground }]}>{formatCurrency(tripPauschale)}</Text>
+          <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Fahrtkosten</Text>
+          <Text style={[styles.statSub, { color: colors.mutedForeground }]}>
+            {tripKm.toLocaleString("de-DE")} km · {LEGAL.kilometerpauschale.toFixed(2).replace(".", ",")} €/km
+          </Text>
+        </Pressable>
 
-      <View style={styles.actionsGrid}>
-        {QUICK_ACTIONS.map((a) => (
-          <Pressable
-            key={a.key}
-            onPress={() => {
-              Haptics.selectionAsync();
-              router.push(a.href as never);
-            }}
-            style={({ pressed }) => [
-              styles.actionCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderRadius: colors.radius,
-                opacity: pressed ? 0.7 : 1,
-                transform: [{ scale: pressed ? 0.97 : 1 }],
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.actionIconWrap,
-                { backgroundColor: colors.muted },
+        <Pressable
+          onPress={() => router.push("/(tabs)/bookings")}
+          style={({ pressed }) => [
+            styles.statCard,
+            { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius, opacity: pressed ? 0.75 : 1 },
+          ]}
+        >
+          <Feather name="trending-up" size={20} color={colors.primary} style={{ marginBottom: 6 }} />
+          <Text style={[styles.statValue, { color: colors.foreground }]}>{incomes.length} Buchungen</Text>
+          <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Einnahmen</Text>
+          <Text style={[styles.statSub, { color: colors.mutedForeground }]}>
+            {formatCurrency(ytdRevenue)} gesamt
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* ── Quick actions ────────────────────────────────── */}
+      <View>
+        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Schnellaktionen</Text>
+        <View style={styles.actionsGrid}>
+          {QUICK_ACTIONS.map((a) => (
+            <Pressable
+              key={a.key}
+              onPress={() => {
+                Haptics.selectionAsync();
+                router.push(a.href as never);
+              }}
+              style={({ pressed }) => [
+                styles.actionCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderRadius: colors.radius,
+                  opacity: pressed ? 0.75 : 1,
+                  transform: [{ scale: pressed ? 0.96 : 1 }],
+                },
               ]}
             >
-              <Feather name={a.icon} size={20} color={colors.primary} />
-            </View>
-            <Text style={[styles.actionLabel, { color: colors.foreground }]}>
-              {a.label}
-            </Text>
-          </Pressable>
-        ))}
+              <View style={[styles.actionChip, { backgroundColor: a.iconBg }]}>
+                {a.iconSet === "mci" ? (
+                  <MaterialCommunityIcons name={a.icon as any} size={20} color={a.iconColor} />
+                ) : (
+                  <Feather name={a.icon as any} size={20} color={a.iconColor} />
+                )}
+              </View>
+              <Text style={[styles.actionLabel, { color: colors.foreground }]}>{a.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      {/* ── Tax tip ──────────────────────────────────────── */}
+      <View style={[styles.tipCard, { borderColor: "#BFDBFE" }]}>
+        <View style={[styles.tipIcon, { backgroundColor: colors.primary }]}>
+          <Feather name="info" size={16} color="#ffffff" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.tipTitle, { color: colors.primary }]}>Steuertipp des Tages</Text>
+          <Text style={[styles.tipBody, { color: "#1E40AF" }]}>
+            Homeoffice-Pauschale 2025: bis 1.260 € absetzbar — 6 € pro Heimarbeitstag.
+          </Text>
+        </View>
       </View>
     </ScrollView>
   );
 }
 
-function KpiCard({
-  label,
-  value,
-  subtitle,
-  tone,
-  icon,
-  onPress,
-}: {
-  label: string;
-  value: string;
-  subtitle?: string;
-  tone?: string;
-  icon: React.ComponentProps<typeof Feather>["name"];
-  onPress: () => void;
-}) {
-  const colors = useColors();
-  const toneColor =
-    tone === "success"
-      ? colors.success
-      : tone === "warning"
-        ? colors.warning
-        : tone === "critical"
-          ? colors.critical
-          : colors.primary;
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.kpiCard,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-          borderRadius: colors.radius,
-          opacity: pressed ? 0.7 : 1,
-        },
-      ]}
-    >
-      <View style={styles.kpiHeader}>
-        <Feather name={icon} size={16} color={toneColor} />
-        <Text style={[styles.kpiLabel, { color: colors.mutedForeground }]}>
-          {label}
-        </Text>
-      </View>
-      <Text style={[styles.kpiValue, { color: colors.foreground }]}>
-        {value}
-      </Text>
-      {subtitle ? (
-        <Text style={[styles.kpiSubtitle, { color: colors.mutedForeground }]}>
-          {subtitle}
-        </Text>
-      ) : null}
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   content: {
-    paddingHorizontal: 20,
-    gap: 18,
+    paddingHorizontal: 16,
+    gap: 14,
   },
+
+  /* greeting */
   greetingRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -366,174 +293,209 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   greetingName: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: "Inter_700Bold",
     marginTop: 2,
   },
-  profileButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
-  heroCard: {
-    padding: 22,
-    gap: 14,
-    shadowColor: "#0066B3",
-    shadowOpacity: 0.25,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 14 },
-    elevation: 8,
+
+  /* progress banner */
+  progressCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 14,
+    gap: 8,
   },
-  heroTopRow: {
+  progressCardTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  heroLabel: {
-    fontSize: 13,
+  progressCardLabel: {
+    fontSize: 12,
     fontFamily: "Inter_500Medium",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
   },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
+  statusPill: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: 999,
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  statusLabel: {
-    color: "#ffffff",
+  statusPillText: {
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
-  },
-  heroAmount: {
-    color: "#ffffff",
-    fontSize: 40,
-    fontFamily: "Inter_700Bold",
-    letterSpacing: -1,
-  },
-  heroSubLabel: {
-    fontSize: 13,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Inter_600SemiBold",
   },
   progressTrack: {
     height: 8,
     borderRadius: 4,
     overflow: "hidden",
-    backgroundColor: "rgba(255,255,255,0.18)",
-    marginTop: 4,
   },
   progressFill: {
     height: "100%",
+    borderRadius: 4,
+  },
+  progressCardBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  progressNote: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+  },
+
+  /* hero card */
+  heroCard: {
+    padding: 22,
+    backgroundColor: "#0066B3",
+    overflow: "hidden",
+    shadowColor: "#0066B3",
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  },
+  heroOrb1: {
+    position: "absolute",
+    top: -44,
+    right: -44,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "rgba(255,255,255,0.06)",
+  },
+  heroOrb2: {
+    position: "absolute",
+    bottom: -32,
+    left: -24,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: "rgba(255,255,255,0.04)",
+  },
+  heroLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    color: "rgba(207,230,255,0.85)",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+  heroAmount: {
+    fontSize: 40,
+    fontFamily: "Inter_800ExtraBold",
+    color: "#ffffff",
+    letterSpacing: -1,
+    marginTop: 8,
+  },
+  heroDivider: {
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    marginVertical: 14,
   },
   heroFooter: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 4,
+    gap: 24,
   },
-  heroMicroLabel: {
+  heroFooterLabel: {
     fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
+    fontFamily: "Inter_400Regular",
+    color: "rgba(207,230,255,0.7)",
   },
-  heroMicroValue: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
+  heroFooterValue: {
+    fontSize: 16,
+    fontFamily: "Inter_700Bold",
     marginTop: 2,
   },
-  kpiRow: {
+
+  /* stat cards */
+  statRow: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
   },
-  kpiCard: {
+  statCard: {
     flex: 1,
-    padding: 16,
-    borderWidth: 1,
-    gap: 8,
-  },
-  kpiHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  kpiLabel: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
-  },
-  kpiValue: {
-    fontSize: 22,
-    fontFamily: "Inter_700Bold",
-  },
-  kpiSubtitle: {
-    fontSize: 11,
-    fontFamily: "Inter_500Medium",
-  },
-  summaryCard: {
-    padding: 16,
+    padding: 14,
     borderWidth: 1,
   },
-  summaryRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 6,
-  },
-  divider: {
-    width: 1,
-    height: 32,
-  },
-  summaryLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_500Medium",
-    textTransform: "uppercase",
-  },
-  summaryValue: {
-    fontSize: 18,
+  statValue: {
+    fontSize: 17,
     fontFamily: "Inter_700Bold",
   },
+  statLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    marginTop: 2,
+  },
+  statSub: {
+    fontSize: 10,
+    fontFamily: "Inter_400Regular",
+    marginTop: 1,
+  },
+
+  /* quick actions */
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontFamily: "Inter_700Bold",
-    marginTop: 8,
+    marginBottom: 10,
   },
   actionsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 8,
   },
   actionCard: {
-    width: "47.5%",
-    padding: 16,
+    width: "22.5%",
+    paddingTop: 14,
+    paddingBottom: 10,
+    paddingHorizontal: 4,
     borderWidth: 1,
-    flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 7,
   },
-  actionIconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+  actionChip: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
   actionLabel: {
-    fontSize: 14,
+    fontSize: 10,
     fontFamily: "Inter_600SemiBold",
-    flexShrink: 1,
+    textAlign: "center",
+  },
+
+  /* tax tip */
+  tipCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "#EBF5FF",
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 14,
+  },
+  tipIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  tipTitle: {
+    fontSize: 12,
+    fontFamily: "Inter_700Bold",
+  },
+  tipBody: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    marginTop: 2,
+    lineHeight: 16,
   },
 });

@@ -22,6 +22,9 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
         const stored = await AsyncStorage.getItem("taxbuddy.profile");
         if (stored) {
           setProfile(JSON.parse(stored));
+        } else {
+          await AsyncStorage.setItem("taxbuddy.profile", JSON.stringify(defaultProfile));
+          setProfile(defaultProfile);
         }
       } catch (error) {
         console.error("Failed to load profile", error);
