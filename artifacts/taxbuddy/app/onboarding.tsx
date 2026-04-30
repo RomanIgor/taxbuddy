@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,20 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   Image,
 } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInLeft,
+  FadeInRight,
+  FadeInUp,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  Easing,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -19,332 +29,503 @@ import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Branch } from "@/types";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: W, height: H } = Dimensions.get("window");
 
-const raccoonBadge  = require("@/assets/images/raccoon_suit_badge.jpeg");
-const raccoonThumbs = require("@/assets/images/raccoon_suit_thumbs.jpeg");
-const raccoonCircle = require("@/assets/images/raccoon_logo_circle.jpeg");
+const imgThumbs  = require("@/assets/images/raccoon_suit_thumbs_nobg.png");
+const imgCircle  = require("@/assets/images/raccoon_logo_circle.jpeg");
+const imgBadge   = require("@/assets/images/raccoon_suit_badge.jpeg");
 
+const NAVY  = "#0F2B4C";
+const BLUE  = "#0066B3";
+const GREEN = "#3DB54A";
+
+/* ─── Branches ─── */
 const branches: { id: Branch; label: string }[] = [
-  { id: "it",        label: "IT & Software" },
-  { id: "design",    label: "Design & Medien" },
-  { id: "beratung",  label: "Beratung & Consulting" },
-  { id: "handel",    label: "Handel & E-Commerce" },
-  { id: "handwerk",  label: "Handwerk" },
-  { id: "content",   label: "Content Creation" },
-  { id: "marketing", label: "Marketing & PR" },
-  { id: "gastro",    label: "Gastronomie" },
-  { id: "gesundheit",label: "Gesundheit & Pflege" },
-  { id: "bildung",   label: "Bildung & Coaching" },
-  { id: "immobilien",label: "Immobilien" },
-  { id: "kfz",       label: "KFZ & Transport" },
-  { id: "event",     label: "Event & Unterhaltung" },
-  { id: "finanz",    label: "Finanzen & Versicherung" },
-  { id: "recht",     label: "Recht & Steuern" },
-  { id: "sonstiges", label: "Sonstiges" },
+  { id: "it",         label: "IT & Software" },
+  { id: "design",     label: "Design & Medien" },
+  { id: "beratung",   label: "Beratung & Consulting" },
+  { id: "handel",     label: "Handel & E-Commerce" },
+  { id: "handwerk",   label: "Handwerk" },
+  { id: "content",    label: "Content Creation" },
+  { id: "marketing",  label: "Marketing & PR" },
+  { id: "gastro",     label: "Gastronomie" },
+  { id: "gesundheit", label: "Gesundheit & Pflege" },
+  { id: "bildung",    label: "Bildung & Coaching" },
+  { id: "immobilien", label: "Immobilien" },
+  { id: "kfz",        label: "KFZ & Transport" },
+  { id: "event",      label: "Event & Unterhaltung" },
+  { id: "finanz",     label: "Finanzen & Versicherung" },
+  { id: "recht",      label: "Recht & Steuern" },
+  { id: "sonstiges",  label: "Sonstiges" },
 ];
 
-/* ─── Intro slide data ─── */
+/* ═══════════════════════════════════════
+   INTRO SLIDES
+═══════════════════════════════════════ */
 
-const INTRO_SLIDES = [
-  {
-    image: raccoonBadge,
-    imageStyle: { width: SCREEN_WIDTH * 0.72, height: SCREEN_WIDTH * 0.72 },
-    bg: "#0F2B4C",
-    headline: "Willkommen bei TAXbuddy",
-    sub: "Dein smarter Steuer-Buddy fur Kleinunternehmer und Freelancer in Deutschland.",
-    badge: null,
-  },
-  {
-    image: raccoonThumbs,
-    imageStyle: { width: SCREEN_WIDTH * 0.68, height: SCREEN_WIDTH * 0.76 },
-    bg: "#0066B3",
-    headline: "Einnahmen & Ausgaben im Blick",
-    sub: "Erfasse Buchungen in Sekunden. Behalte Umsatz und Steuerpflicht stets unter Kontrolle — ohne Buchhaltungskenntnisse.",
-    badge: null,
-  },
-  {
-    image: raccoonCircle,
-    imageStyle: { width: SCREEN_WIDTH * 0.62, height: SCREEN_WIDTH * 0.62, borderRadius: SCREEN_WIDTH * 0.31 },
-    bg: "#0F2B4C",
-    headline: "Fahrtenbuch & Steuer-Check",
-    sub: "Tracke betriebliche Fahrten und hole dir 0,30 EUR pro km zuruck. Erhalte personalisierte Steuertipps und Empfehlungen.",
-    badge: null,
-  },
-  {
-    image: raccoonCircle,
-    imageStyle: { width: SCREEN_WIDTH * 0.52, height: SCREEN_WIDTH * 0.52, borderRadius: SCREEN_WIDTH * 0.26 },
-    bg: "#0F2B4C",
-    headline: "In 60 Sekunden eingerichtet",
-    sub: "Wir benotigen nur drei kurze Angaben, dann bist du startklar. Clever. Entspannt. Steuern im Griff.",
-    badge: "Kostenlos & ohne Anmeldung",
-  },
-];
+function Slide0() {
+  return (
+    <View style={[sl.root, { backgroundColor: BLUE, flexDirection: "row" }]}>
+      {/* Wordmark left */}
+      <Animated.View entering={FadeInLeft.duration(500).springify()} style={sl.left}>
+        <Text style={sl.taxWord}>TAX</Text>
+        <Text style={sl.buddyWord}>buddy</Text>
+        <View style={sl.divider} />
+        <Text style={sl.tagline}>STEUERN IM GRIFF</Text>
+        <Text style={sl.sub}>
+          Dein smarter{"\n"}Steuer-Buddy fur{"\n"}Kleinunternehmer.
+        </Text>
+      </Animated.View>
 
-/* ─── Component ─── */
+      {/* Mascot right */}
+      <Animated.View entering={FadeInRight.duration(600).delay(100).springify()} style={sl.right}>
+        <Image source={imgThumbs} style={sl.mascotThumbs} resizeMode="contain" />
+      </Animated.View>
+
+      {/* Bottom glow */}
+      <View style={sl.glow} />
+    </View>
+  );
+}
+
+function Slide1() {
+  const features = [
+    { icon: "↑", label: "Einnahmen erfassen", color: GREEN },
+    { icon: "↓", label: "Ausgaben tracken",   color: "#EF4444" },
+    { icon: "→", label: "Fahrtenbuch",         color: BLUE },
+    { icon: "✓", label: "Steuer-Check",        color: "#F59E0B" },
+  ];
+  return (
+    <View style={[sl.root, { backgroundColor: NAVY }]}>
+      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
+        <Animated.View entering={FadeIn.duration(300).delay(80)} style={sl.circleWrap}>
+          <Image source={imgCircle} style={sl.mascotCircle} resizeMode="cover" />
+        </Animated.View>
+        <Animated.Text entering={FadeInUp.duration(400).delay(150)} style={sl.slideHeadline}>
+          Alles an einem Ort
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(400).delay(220)} style={sl.slideSub}>
+          Einnahmen, Ausgaben, Fahrten und Steuertipps — ubersichtlich und einfach.
+        </Animated.Text>
+        <View style={sl.featureGrid}>
+          {features.map((f, i) => (
+            <Animated.View
+              key={f.label}
+              entering={FadeInUp.duration(350).delay(280 + i * 70).springify()}
+              style={[sl.featureChip, { borderColor: f.color + "40" }]}
+            >
+              <Text style={[sl.featureIcon, { color: f.color }]}>{f.icon}</Text>
+              <Text style={sl.featureLabel}>{f.label}</Text>
+            </Animated.View>
+          ))}
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+function Slide2() {
+  return (
+    <View style={[sl.root, { backgroundColor: NAVY }]}>
+      <Animated.View entering={FadeInDown.duration(500)} style={sl.centerContent}>
+        <Animated.Text entering={FadeInUp.duration(400).delay(80)} style={sl.slideOverline}>
+          KILOMETERPAUSCHALE · STEUERTIPPS · KI-ASSISTENT
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(400).delay(150)} style={[sl.slideHeadline, { fontSize: 30 }]}>
+          Keine Uberraschungen{"\n"}mehr beim Finanzamt
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(400).delay(220)} style={sl.slideSub}>
+          TAXbuddy rechnet automatisch mit — und warnt dich, bevor es teuer wird.
+        </Animated.Text>
+        <Animated.View entering={FadeInUp.duration(500).delay(320).springify()} style={sl.statRow}>
+          <View style={sl.statCard}>
+            <Text style={sl.statNum}>0,30{"\n"}<Text style={sl.statUnit}>EUR/km</Text></Text>
+            <Text style={sl.statDesc}>Kilometerpauschale</Text>
+          </View>
+          <View style={sl.statDivider} />
+          <View style={sl.statCard}>
+            <Text style={sl.statNum}>25.000{"\n"}<Text style={sl.statUnit}>EUR</Text></Text>
+            <Text style={sl.statDesc}>Kleinunternehmergrenze</Text>
+          </View>
+        </Animated.View>
+      </Animated.View>
+    </View>
+  );
+}
+
+function Slide3() {
+  return (
+    <View style={[sl.root, { backgroundColor: NAVY }]}>
+      <Animated.View entering={FadeInDown.duration(400)} style={sl.centerContent}>
+        <Animated.View entering={FadeIn.duration(400).delay(60)}>
+          <Image source={imgBadge} style={sl.mascotBadge} resizeMode="contain" />
+        </Animated.View>
+        <Animated.View
+          entering={FadeInUp.duration(400).delay(180)}
+          style={[sl.greenPill]}
+        >
+          <Text style={sl.greenPillText}>Kostenlos & ohne Anmeldung</Text>
+        </Animated.View>
+        <Animated.Text entering={FadeInUp.duration(400).delay(240)} style={[sl.slideHeadline, { textAlign: "center" }]}>
+          In 60 Sekunden startklar
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.duration(400).delay(300)} style={[sl.slideSub, { textAlign: "center" }]}>
+          Drei kurze Angaben genugen. Clever. Entspannt. Steuern im Griff.
+        </Animated.Text>
+      </Animated.View>
+    </View>
+  );
+}
+
+const SLIDES = [Slide0, Slide1, Slide2, Slide3];
+
+/* ═══════════════════════════════════════
+   ANIMATED PROGRESS BAR
+═══════════════════════════════════════ */
+
+function SetupProgress({ step, total }: { step: number; total: number }) {
+  const progress = useSharedValue(0);
+  useEffect(() => {
+    progress.value = withTiming((step - 1) / total, { duration: 400, easing: Easing.out(Easing.cubic) });
+  }, [step]);
+  const barStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%` as unknown as number,
+  }));
+  return (
+    <View style={prog.track}>
+      <Animated.View style={[prog.fill, barStyle]} />
+    </View>
+  );
+}
+
+/* ═══════════════════════════════════════
+   MAIN ONBOARDING SCREEN
+═══════════════════════════════════════ */
 
 export default function OnboardingScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { updateProfile } = useProfile();
 
-  const [step, setStep] = useState(0);
-  const [slideIndex, setSlideIndex] = useState(0);
-  const [name, setName] = useState("");
-  const [branch, setBranch] = useState<Branch>("sonstiges");
-  const [revenueGoal, setRevenueGoal] = useState("30000");
+  const [phase, setPhase]     = useState<"intro" | "setup">("intro");
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [step, setStep]       = useState(1);
+  const [name, setName]       = useState("");
+  const [branch, setBranch]   = useState<Branch>("sonstiges");
+  const [revenue, setRevenue] = useState("30000");
 
-  const scrollRef = useRef<ScrollView>(null);
+  const btnScale = useSharedValue(1);
+  const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnScale.value }] }));
 
-  const isIntro = step === 0;
-  const isLastSlide = slideIndex === INTRO_SLIDES.length - 1;
-
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-    setSlideIndex(idx);
+  const tapBtn = (cb: () => void) => {
+    btnScale.value = withSpring(0.96, { damping: 15 }, () => {
+      btnScale.value = withSpring(1, { damping: 12 });
+    });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    cb();
   };
 
-  const goNextSlide = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (isLastSlide) {
-      setStep(1);
-    } else {
-      const next = slideIndex + 1;
-      scrollRef.current?.scrollTo({ x: next * SCREEN_WIDTH, animated: true });
-      setSlideIndex(next);
-    }
-  };
+  const isLastSlide = slideIdx === SLIDES.length - 1;
 
-  const handleSetupNext = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (step < 3) setStep(step + 1);
+  const goNext = () => tapBtn(() => {
+    if (isLastSlide) setPhase("setup");
+    else setSlideIdx((i) => i + 1);
+  });
+  const goBack = () => tapBtn(() => {
+    if (slideIdx > 0) setSlideIdx((i) => i - 1);
+  });
+  const skip = () => { Haptics.selectionAsync(); setPhase("setup"); };
+
+  const setupNext = () => tapBtn(() => {
+    if (step < 3) setStep((s) => s + 1);
     else handleComplete();
-  };
+  });
 
   const handleComplete = async () => {
     await updateProfile({
       name,
       branch,
-      revenueGoal: parseInt(revenueGoal) || 30000,
+      revenueGoal: parseInt(revenue) || 30000,
       onboardingComplete: true,
     });
     router.replace("/(tabs)");
   };
 
-  /* ── Intro carousel ── */
-  if (isIntro) {
-    const slide = INTRO_SLIDES[slideIndex];
+  /* ── INTRO ── */
+  if (phase === "intro") {
+    const SlideComp = SLIDES[slideIdx];
     return (
-      <View style={[introStyles.root, { backgroundColor: slide.bg }]}>
-        {/* Slides */}
-        <ScrollView
-          ref={scrollRef}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={handleScroll}
-          scrollEventThrottle={16}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ alignItems: "flex-end" }}
-        >
-          {INTRO_SLIDES.map((s, i) => (
-            <View key={i} style={[introStyles.slide, { width: SCREEN_WIDTH, backgroundColor: s.bg, paddingTop: insets.top + 40 }]}>
-              {/* Image */}
-              <View style={introStyles.imageWrap}>
-                <Image source={s.image} style={[introStyles.mascot, s.imageStyle]} resizeMode="contain" />
-              </View>
+      <View style={{ flex: 1, backgroundColor: NAVY }}>
+        {/* Slide — key forces re-mount so entering animation fires each time */}
+        <Animated.View key={slideIdx} style={{ flex: 1 }} entering={FadeIn.duration(280)}>
+          <SlideComp />
+        </Animated.View>
 
-              {/* Text */}
-              <View style={[introStyles.textCard, { paddingBottom: insets.bottom + 140 }]}>
-                {s.badge && (
-                  <View style={introStyles.badge}>
-                    <Text style={introStyles.badgeText}>{s.badge}</Text>
-                  </View>
-                )}
-                <Text style={introStyles.headline}>{s.headline}</Text>
-                <Text style={introStyles.sub}>{s.sub}</Text>
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+        {/* Bottom controls */}
+        <View style={[ctrl.container, { paddingBottom: insets.bottom + 24 }]}>
+          {/* Dots */}
+          <View style={ctrl.dots}>
+            {SLIDES.map((_, i) => (
+              <View
+                key={i}
+                style={[ctrl.dot, {
+                  backgroundColor: i === slideIdx ? GREEN : "rgba(255,255,255,0.3)",
+                  width: i === slideIdx ? 22 : 8,
+                }]}
+              />
+            ))}
+          </View>
 
-        {/* Dots */}
-        <View style={[introStyles.dotsRow, { bottom: insets.bottom + 100 }]}>
-          {INTRO_SLIDES.map((_, i) => (
-            <View key={i} style={[introStyles.dot, { backgroundColor: i === slideIndex ? "#fff" : "rgba(255,255,255,0.3)", width: i === slideIndex ? 20 : 8 }]} />
-          ))}
-        </View>
+          {/* Buttons */}
+          <View style={ctrl.row}>
+            {slideIdx > 0 ? (
+              <Pressable onPress={goBack} style={ctrl.backBtn}>
+                <Text style={ctrl.backText}>Zuruck</Text>
+              </Pressable>
+            ) : (
+              <Pressable onPress={skip} style={ctrl.backBtn}>
+                <Text style={ctrl.backText}>Uberspringen</Text>
+              </Pressable>
+            )}
 
-        {/* CTA button */}
-        <View style={[introStyles.btnWrap, { paddingBottom: insets.bottom + 28 }]}>
-          <Pressable
-            onPress={goNextSlide}
-            style={({ pressed }) => [introStyles.btn, { opacity: pressed ? 0.85 : 1 }]}
-          >
-            <Text style={introStyles.btnText}>
-              {isLastSlide ? "Jetzt einrichten" : "Weiter"}
-            </Text>
-          </Pressable>
-          {!isLastSlide && (
-            <Pressable onPress={() => setStep(1)} style={introStyles.skip}>
-              <Text style={introStyles.skipText}>Uberspringen</Text>
-            </Pressable>
-          )}
+            <Animated.View style={[ctrl.nextWrap, btnStyle]}>
+              <Pressable onPress={goNext} style={[ctrl.nextBtn, { backgroundColor: isLastSlide ? GREEN : BLUE }]}>
+                <Text style={ctrl.nextText}>{isLastSlide ? "Jetzt einrichten" : "Weiter"}</Text>
+              </Pressable>
+            </Animated.View>
+          </View>
         </View>
       </View>
     );
   }
 
-  /* ── Setup steps (1-3) ── */
+  /* ── SETUP ── */
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <View style={styles.progressContainer}>
-          {[1, 2, 3].map((s) => (
-            <View
-              key={s}
-              style={[styles.progressBar, { backgroundColor: s <= step ? colors.primary : colors.border }]}
-            />
-          ))}
-        </View>
-      </View>
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      {/* Top bar */}
+      <Animated.View
+        entering={FadeInDown.duration(400)}
+        style={[styles.topBar, { paddingTop: insets.top + 16 }]}
+      >
+        <SetupProgress step={step} total={3} />
+        <Text style={[styles.stepLabel, { color: colors.mutedForeground }]}>
+          Schritt {step} von 3
+        </Text>
+      </Animated.View>
 
       <KeyboardAwareScrollViewCompat
-        style={styles.content}
-        contentContainerStyle={styles.scrollContent}
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 120 }]}
         bottomOffset={40}
       >
+        {/* Step 1 — Name */}
         {step === 1 && (
-          <View style={styles.stepContainer}>
-            <View style={[styles.logoHero, { backgroundColor: colors.primary }]}>
-              <View style={styles.heroRow}>
-                <View style={styles.heroLeft}>
-                  <Text style={styles.heroTitle}>TAX</Text>
-                  <Text style={styles.heroBuddy}>buddy</Text>
-                  <Text style={styles.heroTagline}>STEUERN IM GRIFF</Text>
-                </View>
-                <Image source={raccoonThumbs} style={styles.heroImage} resizeMode="contain" />
+          <Animated.View key="s1" entering={FadeInUp.duration(420).springify()} style={styles.stepWrap}>
+            {/* Hero banner */}
+            <Animated.View entering={FadeIn.duration(350)} style={[styles.heroBanner, { backgroundColor: BLUE }]}>
+              <View style={styles.heroLeft}>
+                <Text style={styles.heroTAX}>TAX</Text>
+                <Text style={styles.heroBuddy}>buddy</Text>
+                <Text style={styles.heroTag}>STEUERN IM GRIFF</Text>
               </View>
-            </View>
-            <Text style={[styles.title, { color: colors.foreground }]}>Willkommen!</Text>
-            <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
+              <Image source={imgThumbs} style={styles.heroImg} resizeMode="contain" />
+            </Animated.View>
+
+            <Animated.Text entering={FadeInDown.duration(350).delay(80)} style={[styles.title, { color: colors.foreground }]}>
+              Willkommen!
+            </Animated.Text>
+            <Animated.Text entering={FadeInDown.duration(350).delay(140)} style={[styles.sub, { color: colors.mutedForeground }]}>
               Dein smarter Steuerbegleiter fur Kleinunternehmer. Wie durfen wir dich nennen?
-            </Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
-              placeholder="Dein Name"
-              placeholderTextColor={colors.mutedForeground}
-              value={name}
-              onChangeText={setName}
-              autoFocus
-            />
-          </View>
+            </Animated.Text>
+            <Animated.View entering={FadeInDown.duration(400).delay(200).springify()}>
+              <TextInput
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
+                placeholder="Dein Name"
+                placeholderTextColor={colors.mutedForeground}
+                value={name}
+                onChangeText={setName}
+                autoFocus
+              />
+            </Animated.View>
+          </Animated.View>
         )}
 
+        {/* Step 2 — Branch */}
         {step === 2 && (
-          <View style={styles.stepContainer}>
-            <Text style={[styles.title, { color: colors.foreground }]}>In welcher Branche bist du tatig?</Text>
-            <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-              Damit wir dir passende Steuertipps geben konnen.
-            </Text>
-            <View style={styles.grid}>
-              {branches.map((b) => (
-                <Pressable
+          <Animated.View key="s2" entering={FadeInUp.duration(400).springify()} style={styles.stepWrap}>
+            <Animated.Text entering={FadeInDown.duration(350)} style={[styles.title, { color: colors.foreground }]}>
+              Deine Branche
+            </Animated.Text>
+            <Animated.Text entering={FadeInDown.duration(350).delay(80)} style={[styles.sub, { color: colors.mutedForeground }]}>
+              Wir passen deine Steuertipps und Empfehlungen genau darauf an.
+            </Animated.Text>
+            <Animated.View entering={FadeIn.duration(400).delay(140)} style={styles.grid}>
+              {branches.map((b, i) => (
+                <Animated.View
                   key={b.id}
-                  style={[
-                    styles.gridItem,
-                    { backgroundColor: branch === b.id ? colors.primary : colors.card, borderColor: branch === b.id ? colors.primary : colors.border },
-                  ]}
-                  onPress={() => { Haptics.selectionAsync(); setBranch(b.id); }}
+                  entering={FadeInUp.duration(280).delay(160 + i * 25).springify()}
                 >
-                  <Text style={[styles.gridItemText, { color: branch === b.id ? colors.primaryForeground : colors.foreground }]}>
-                    {b.label}
-                  </Text>
-                </Pressable>
+                  <Pressable
+                    style={[
+                      styles.chip,
+                      {
+                        backgroundColor: branch === b.id ? BLUE : colors.card,
+                        borderColor: branch === b.id ? BLUE : colors.border,
+                      },
+                    ]}
+                    onPress={() => { Haptics.selectionAsync(); setBranch(b.id); }}
+                  >
+                    <Text style={[styles.chipText, { color: branch === b.id ? "#fff" : colors.foreground }]}>
+                      {b.label}
+                    </Text>
+                  </Pressable>
+                </Animated.View>
               ))}
-            </View>
-          </View>
+            </Animated.View>
+          </Animated.View>
         )}
 
+        {/* Step 3 — Revenue */}
         {step === 3 && (
-          <View style={styles.stepContainer}>
-            <Text style={[styles.title, { color: colors.foreground }]}>Was ist dein Umsatzziel fur dieses Jahr?</Text>
-            <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-              Die Kleinunternehmergrenze liegt aktuell bei 25.000 EUR.
-            </Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
-              placeholder="z. B. 20000"
-              placeholderTextColor={colors.mutedForeground}
-              value={revenueGoal}
-              onChangeText={setRevenueGoal}
-              keyboardType="numeric"
-              autoFocus
-            />
-          </View>
+          <Animated.View key="s3" entering={FadeInUp.duration(400).springify()} style={styles.stepWrap}>
+            <Animated.Text entering={FadeInDown.duration(350)} style={[styles.title, { color: colors.foreground }]}>
+              Dein Umsatzziel
+            </Animated.Text>
+            <Animated.Text entering={FadeInDown.duration(350).delay(80)} style={[styles.sub, { color: colors.mutedForeground }]}>
+              Die Kleinunternehmergrenze liegt bei 25.000 EUR. Wir berechnen automatisch, wie weit du bist.
+            </Animated.Text>
+            <Animated.View entering={FadeInDown.duration(400).delay(160).springify()}>
+              <TextInput
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
+                placeholder="z. B. 20000"
+                placeholderTextColor={colors.mutedForeground}
+                value={revenue}
+                onChangeText={setRevenue}
+                keyboardType="numeric"
+                autoFocus
+              />
+            </Animated.View>
+            <Animated.View entering={FadeIn.duration(400).delay(260)}>
+              <View style={[styles.infoBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Text style={[styles.infoText, { color: colors.mutedForeground }]}>
+                  Ab 22.000 EUR empfehlen wir, das Limit im Blick zu behalten.
+                  TAXbuddy warnt dich automatisch, wenn du dich der Grenze naherst.
+                </Text>
+              </View>
+            </Animated.View>
+          </Animated.View>
         )}
       </KeyboardAwareScrollViewCompat>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
-        <Pressable
-          style={[styles.button, { backgroundColor: colors.primary, opacity: (step === 1 && !name) ? 0.5 : 1 }]}
-          onPress={handleSetupNext}
-          disabled={step === 1 && !name}
-        >
-          <Text style={[styles.buttonText, { color: colors.primaryForeground }]}>
-            {step === 3 ? "Loslegen" : "Weiter"}
-          </Text>
-        </Pressable>
-      </View>
+      {/* Footer CTA */}
+      <Animated.View
+        entering={FadeInUp.duration(400).delay(80)}
+        style={[styles.footer, { paddingBottom: insets.bottom + 20, backgroundColor: colors.background }]}
+      >
+        <Animated.View style={btnStyle}>
+          <Pressable
+            style={[styles.cta, { backgroundColor: BLUE, opacity: (step === 1 && !name.trim()) ? 0.45 : 1 }]}
+            onPress={setupNext}
+            disabled={step === 1 && !name.trim()}
+          >
+            <Text style={styles.ctaText}>{step === 3 ? "Loslegen" : "Weiter"}</Text>
+          </Pressable>
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }
 
-/* ─── Intro styles ─── */
+/* ═══════════════════════════════════════
+   STYLES — Slide internals
+═══════════════════════════════════════ */
 
-const introStyles = StyleSheet.create({
-  root:      { flex: 1 },
-  slide:     { flex: 1, alignItems: "center" },
-  imageWrap: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 },
-  mascot:    { maxWidth: SCREEN_WIDTH * 0.8 },
-  textCard:  { width: "100%", paddingHorizontal: 32, paddingTop: 24, gap: 12 },
-  badge:     { alignSelf: "flex-start", backgroundColor: "#3DB54A", borderRadius: 999, paddingHorizontal: 14, paddingVertical: 5 },
-  badgeText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 12, letterSpacing: 0.5 },
-  headline:  { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 26, lineHeight: 32 },
-  sub:       { color: "rgba(255,255,255,0.72)", fontFamily: "Inter_500Medium", fontSize: 15, lineHeight: 22 },
-  dotsRow:   { position: "absolute", left: 0, right: 0, flexDirection: "row", justifyContent: "center", gap: 6, alignItems: "center" },
-  dot:       { height: 8, borderRadius: 4 },
-  btnWrap:   { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: 24, gap: 12, alignItems: "center" },
-  btn:       { width: "100%", height: 56, borderRadius: 18, backgroundColor: "#3DB54A", alignItems: "center", justifyContent: "center" },
-  btnText:   { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 16 },
-  skip:      { paddingVertical: 6 },
-  skipText:  { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_500Medium", fontSize: 14 },
+const sl = StyleSheet.create({
+  root:           { flex: 1 },
+  glow:           { position: "absolute", bottom: -60, left: -40, width: W * 1.2, height: 180, borderRadius: 999, backgroundColor: "rgba(61,181,74,0.08)" },
+
+  /* Slide 0 */
+  left:           { flex: 1, justifyContent: "flex-end", paddingLeft: 28, paddingBottom: 60, paddingTop: 0, gap: 2, zIndex: 2 },
+  right:          { width: W * 0.50, alignItems: "flex-end", justifyContent: "flex-end" },
+  taxWord:        { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 56, letterSpacing: -2, lineHeight: 58 },
+  buddyWord:      { color: GREEN,  fontFamily: "Inter_400Regular",   fontSize: 56, letterSpacing: -2, lineHeight: 60, marginBottom: 14 },
+  divider:        { width: 40, height: 2, backgroundColor: "rgba(255,255,255,0.3)", marginBottom: 12 },
+  tagline:        { color: "rgba(255,255,255,0.55)", fontFamily: "Inter_600SemiBold", fontSize: 10, letterSpacing: 2.8, marginBottom: 16 },
+  sub:            { color: "rgba(255,255,255,0.80)", fontFamily: "Inter_500Medium",   fontSize: 14, lineHeight: 20 },
+  mascotThumbs:   { width: W * 0.52, height: H * 0.62 },
+
+  /* Slides 1–3 */
+  centerContent:  { flex: 1, alignItems: "flex-start", justifyContent: "center", paddingHorizontal: 32, gap: 16 },
+  circleWrap:     { width: 88, height: 88, borderRadius: 44, overflow: "hidden", borderWidth: 3, borderColor: GREEN },
+  mascotCircle:   { width: 88, height: 88 },
+  slideOverline:  { color: "rgba(255,255,255,0.4)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 1.8 },
+  slideHeadline:  { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 26, lineHeight: 32 },
+  slideSub:       { color: "rgba(255,255,255,0.68)", fontFamily: "Inter_500Medium",   fontSize: 15, lineHeight: 22 },
+
+  featureGrid:    { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 4 },
+  featureChip:    { flexDirection: "row", alignItems: "center", gap: 7, borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: "rgba(255,255,255,0.06)" },
+  featureIcon:    { fontFamily: "Inter_700Bold", fontSize: 14 },
+  featureLabel:   { color: "#fff", fontFamily: "Inter_500Medium", fontSize: 13 },
+
+  statRow:        { flexDirection: "row", gap: 0, borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", borderRadius: 18, overflow: "hidden", backgroundColor: "rgba(255,255,255,0.05)" },
+  statCard:       { flex: 1, padding: 18, gap: 4 },
+  statDivider:    { width: 1, backgroundColor: "rgba(255,255,255,0.12)", marginVertical: 12 },
+  statNum:        { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 22, lineHeight: 28 },
+  statUnit:       { color: GREEN,  fontFamily: "Inter_600SemiBold",   fontSize: 13 },
+  statDesc:       { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_500Medium", fontSize: 11 },
+
+  mascotBadge:    { width: W * 0.62, height: W * 0.62, alignSelf: "center" },
+  greenPill:      { alignSelf: "flex-start", backgroundColor: GREEN, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 5 },
+  greenPillText:  { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 12 },
 });
 
-/* ─── Setup styles ─── */
+/* ── Controls (intro bottom) ── */
+const ctrl = StyleSheet.create({
+  container: { paddingHorizontal: 28, gap: 20, paddingTop: 12 },
+  dots:      { flexDirection: "row", justifyContent: "center", gap: 6, alignItems: "center" },
+  dot:       { height: 8, borderRadius: 4 },
+  row:       { flexDirection: "row", alignItems: "center", gap: 12 },
+  backBtn:   { paddingHorizontal: 18, paddingVertical: 14 },
+  backText:  { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_600SemiBold", fontSize: 14 },
+  nextWrap:  { flex: 1 },
+  nextBtn:   { height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  nextText:  { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 16 },
+});
 
+/* ── Progress bar ── */
+const prog = StyleSheet.create({
+  track: { height: 4, borderRadius: 2, backgroundColor: "rgba(0,0,0,0.08)", overflow: "hidden" },
+  fill:  { height: 4, borderRadius: 2, backgroundColor: BLUE },
+});
+
+/* ── Setup steps ── */
 const styles = StyleSheet.create({
-  container:    { flex: 1 },
-  header:       { paddingHorizontal: 24, paddingBottom: 24 },
-  progressContainer: { flexDirection: "row", gap: 8 },
-  progressBar:  { flex: 1, height: 4, borderRadius: 2 },
-  content:      { flex: 1 },
-  scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
-  stepContainer: { gap: 16 },
-  logoHero:     { borderRadius: 24, overflow: "hidden", marginBottom: 8 },
-  heroRow:      { flexDirection: "row", alignItems: "flex-end" },
-  heroLeft:     { flex: 1, paddingVertical: 32, paddingLeft: 24, paddingRight: 8, justifyContent: "center", gap: 2 },
-  heroTitle:    { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 36, letterSpacing: -1 },
-  heroBuddy:    { color: "#3DB54A", fontFamily: "Inter_400Regular", fontSize: 36, letterSpacing: -1 },
-  heroTagline:  { color: "rgba(255,255,255,0.6)", fontFamily: "Inter_500Medium", fontSize: 10, letterSpacing: 2, marginTop: 4 },
-  heroImage:    { width: 160, height: 190 },
-  title:        { fontSize: 26, fontFamily: "Inter_800ExtraBold", lineHeight: 32 },
-  subtitle:     { fontSize: 15, fontFamily: "Inter_500Medium", lineHeight: 22, marginBottom: 8 },
-  input:        { height: 56, borderWidth: 1, borderRadius: 16, paddingHorizontal: 16, fontSize: 16, fontFamily: "Inter_500Medium" },
-  grid:         { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  gridItem:     { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, borderWidth: 1 },
-  gridItemText: { fontSize: 14, fontFamily: "Inter_500Medium" },
-  footer:       { paddingHorizontal: 24, paddingTop: 16 },
-  button:       { height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  buttonText:   { fontSize: 16, fontFamily: "Inter_700Bold" },
+  root:      { flex: 1 },
+  topBar:    { paddingHorizontal: 24, paddingBottom: 8, gap: 8 },
+  stepLabel: { fontFamily: "Inter_500Medium", fontSize: 12 },
+  scroll:    { paddingHorizontal: 24, paddingTop: 20, gap: 16 },
+  stepWrap:  { gap: 16 },
+
+  heroBanner: { borderRadius: 22, overflow: "hidden", flexDirection: "row", alignItems: "flex-end", minHeight: 190 },
+  heroLeft:   { flex: 1, paddingVertical: 28, paddingLeft: 24, paddingRight: 8, gap: 2 },
+  heroTAX:    { color: "#fff", fontFamily: "Inter_800ExtraBold", fontSize: 40, letterSpacing: -1, lineHeight: 42 },
+  heroBuddy:  { color: GREEN,  fontFamily: "Inter_400Regular",   fontSize: 40, letterSpacing: -1, lineHeight: 44, marginBottom: 8 },
+  heroTag:    { color: "rgba(255,255,255,0.5)", fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 2.5 },
+  heroImg:    { width: W * 0.42, height: 200 },
+
+  title:     { fontFamily: "Inter_800ExtraBold", fontSize: 26, lineHeight: 32 },
+  sub:       { fontFamily: "Inter_500Medium",   fontSize: 15, lineHeight: 22 },
+
+  input:     { height: 56, borderWidth: 1.5, borderRadius: 16, paddingHorizontal: 18, fontSize: 16, fontFamily: "Inter_500Medium" },
+
+  grid:      { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  chip:      { paddingHorizontal: 16, paddingVertical: 11, borderRadius: 12, borderWidth: 1.5 },
+  chipText:  { fontSize: 13, fontFamily: "Inter_500Medium" },
+
+  infoBox:   { borderWidth: 1, borderRadius: 14, padding: 16 },
+  infoText:  { fontSize: 13, fontFamily: "Inter_500Medium", lineHeight: 20 },
+
+  footer:    { paddingHorizontal: 24, paddingTop: 12, borderTopWidth: 0 },
+  cta:       { height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  ctaText:   { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 16 },
 });
