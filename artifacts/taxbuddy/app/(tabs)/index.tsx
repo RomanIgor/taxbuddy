@@ -129,7 +129,7 @@ export default function DashboardScreen() {
         styles.content,
         {
           paddingBottom: 120 + (isWeb ? 84 : insets.bottom),
-          paddingTop: isWeb ? 80 : 8,
+          paddingTop: isWeb ? 12 : 8,
         },
       ]}
       showsVerticalScrollIndicator={false}
