@@ -7,7 +7,7 @@ import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollV
 import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Branch } from "@/types";
-import { TAXbuddyLogo } from "@/components/TAXbuddyLogo";
+import { TAXbuddyLogo, RaccoonHero } from "@/components/TAXbuddyLogo";
 
 const branches: { id: Branch; label: string }[] = [
   { id: "it", label: "IT & Software" },
@@ -81,7 +81,12 @@ export default function OnboardingScreen() {
         {step === 1 && (
           <View style={styles.stepContainer}>
             <View style={[styles.logoHero, { backgroundColor: colors.primary }]}>
-              <TAXbuddyLogo size="xl" showTagline lightMode />
+              <View style={styles.heroRow}>
+                <View style={styles.heroLeft}>
+                  <TAXbuddyLogo size="lg" showTagline lightMode />
+                </View>
+                <RaccoonHero width={172} height={210} />
+              </View>
             </View>
             <Text style={[styles.title, { color: colors.foreground }]}>
               Willkommen!
@@ -209,11 +214,19 @@ const styles = StyleSheet.create({
   },
   logoHero: {
     borderRadius: 24,
-    paddingVertical: 36,
-    paddingHorizontal: 24,
-    alignItems: "center",
-    justifyContent: "center",
+    overflow: "hidden",
     marginBottom: 8,
+  },
+  heroRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
+  heroLeft: {
+    flex: 1,
+    paddingVertical: 32,
+    paddingLeft: 24,
+    paddingRight: 8,
+    justifyContent: "center",
   },
   title: {
     fontSize: 28,

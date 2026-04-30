@@ -80,7 +80,7 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: "Dashboard",
-          headerTitle: () => <TAXbuddyLogo size="md" />,
+          headerTitle: () => <TAXbuddyLogo size="md" showMascot />,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={24} />
