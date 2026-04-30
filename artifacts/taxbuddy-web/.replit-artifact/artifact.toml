@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/web/"
+title = "TAXbuddy Web"
+version = "1.0.0"
+id = "artifacts/taxbuddy-web"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/web/" ]
+localPort = 22552
+
+[services.development]
+run = "pnpm --filter @workspace/taxbuddy-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/taxbuddy-web", "run", "build" ]
+publicDir = "artifacts/taxbuddy-web/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22552"
+BASE_PATH = "/web/"
