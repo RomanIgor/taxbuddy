@@ -6,6 +6,7 @@ import {
   View,
   Pressable,
   Platform,
+  Dimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -28,6 +29,9 @@ import {
   IconFileText, IconSliders, IconTrendingUp, IconUpload,
   IconUser, IconInfo,
 } from "@/components/DashboardIcons";
+
+const { width: W } = Dimensions.get("window");
+const PROGRESS_TRACK_W = W - 32 - 28; // 16px content padding × 2 + 14px card padding × 2
 
 const SUCCESS_COLOR  = "#16A34A";
 const SUCCESS_BG     = "#DCFCE7";
@@ -96,7 +100,16 @@ export default function DashboardScreen() {
   useEffect(() => {
     progress.value = withTiming(percent / 100, { duration: 900 });
   }, [percent, progress]);
-  const progressStyle = useAnimatedStyle(() => ({ width: `${progress.value * 100}%` as any }));
+  // Simulate transformOrigin:"left" scaleX by pairing translateX + scaleX
+  const progressStyle = useAnimatedStyle(() => {
+    const scale = progress.value;
+    return {
+      transform: [
+        { translateX: -(PROGRESS_TRACK_W / 2) * (1 - scale) },
+        { scaleX: scale },
+      ],
+    };
+  });
 
   const toneColor = (tone: string) =>
     tone === "success" ? SUCCESS_COLOR : tone === "warning" ? WARNING_COLOR : colors.critical;
@@ -128,6 +141,13 @@ export default function DashboardScreen() {
           <Text style={[styles.greetingName, { color: colors.foreground }]}>
             {profile?.name ?? "TAXbuddy"}
           </Text>
+          <Pressable
+            onPress={() => { Haptics.selectionAsync(); router.push("/profile"); }}
+            style={({ pressed }) => [styles.editLink, { opacity: pressed ? 0.6 : 1 }]}
+            accessibilityLabel="Profil bearbeiten"
+          >
+            <Text style={[styles.editLinkText, { color: "#0066B3" }]}>Bearbeiten</Text>
+          </Pressable>
         </View>
         <Pressable
           accessibilityLabel="Profil"
@@ -282,7 +302,7 @@ const styles = StyleSheet.create({
   /* greeting */
   greetingRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingTop: 12,
   },
   greetingHello: {
@@ -294,6 +314,15 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "Inter_700Bold",
     marginTop: 2,
+  },
+  editLink: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    paddingVertical: 2,
+  },
+  editLinkText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
   },
   headerBtn: {
     width: 40,
@@ -336,6 +365,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: "100%",
+    width: "100%",
     borderRadius: 4,
   },
   progressCardBottom: {
