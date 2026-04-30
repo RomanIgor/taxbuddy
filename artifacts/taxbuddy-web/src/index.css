@@ -103,14 +103,14 @@
   --input: 216 20% 90%;
   --ring: 206 100% 35%;
 
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 212 67% 18%;
-  --sidebar-border: 216 20% 90%;
-  --sidebar-primary: 206 100% 35%;
+  --sidebar: 212 67% 18%;          /* #0F2B4C navy */
+  --sidebar-foreground: 214 60% 80%;
+  --sidebar-border: 212 67% 13%;
+  --sidebar-primary: 127 50% 47%;  /* brand green active */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 214 32% 91%;
-  --sidebar-accent-foreground: 212 67% 18%;
-  --sidebar-ring: 206 100% 35%;
+  --sidebar-accent: 212 67% 24%;   /* slightly lighter navy for hover/active bg */
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 127 50% 47%;
 
   --chart-1: 206 100% 35%;
   --chart-2: 127 50% 47%;
