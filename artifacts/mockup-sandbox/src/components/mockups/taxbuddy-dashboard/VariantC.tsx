@@ -17,106 +17,122 @@ function fmtEur(v: number) {
   return v.toLocaleString("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 }
 
-function Icon({ children, color = FOREGROUND }: { children: React.ReactNode; color?: string }) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      {children}
-    </svg>
-  );
-}
+/* ── Modern filled icons ─────────────────────────────────────────────────── */
 
 const IcoEinnahme = () => (
-  <Icon color={SUCCESS}>
-    <path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/>
-    <path d="M5 19h14"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="12" fill="#16A34A" opacity="0"/>
+    {/* Coin + up arrow */}
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#16A34A" opacity="0.15"/>
+    <path d="M16 10l-4-4-4 4h2.5v4h3v-4H16z" fill="#16A34A"/>
+    <path d="M9 16.5h6v1.5H9z" fill="#16A34A"/>
+  </svg>
 );
 
 const IcoAusgabe = () => (
-  <Icon color={WARNING}>
-    <path d="M12 5v14"/><polyline points="19 12 12 19 5 12"/>
-    <path d="M5 5h14"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M8 8l4 4 4-4h-2.5V4h-3v4H8z" fill={WARNING}/>
+    <path d="M9 0h6v1.5H9z" fill={WARNING}/>
+    <rect x="4" y="14" width="16" height="2.5" rx="1.25" fill={WARNING}/>
+    <rect x="4" y="18" width="10" height="2.5" rx="1.25" fill={WARNING} opacity="0.45"/>
+  </svg>
 );
 
 const IcoFahrt = () => (
-  <Icon color={PRIMARY}>
-    <path d="M5 17H3a2 2 0 0 1-2-2v-5l2-4h12l2 4v5a2 2 0 0 1-2 2H5z" strokeWidth="1.8"/>
-    <circle cx="6.5" cy="17" r="1.5"/>
-    <circle cx="15.5" cy="17" r="1.5"/>
-    <path d="M3 11h16"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M17.5 8H6.5L4 13v5h16v-5l-2.5-5z" fill={PRIMARY} opacity="0.15" rx="2"/>
+    <path fillRule="evenodd" clipRule="evenodd"
+      d="M6.94 6a2 2 0 0 0-1.86 1.26L3 13v5a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-5l-2.08-5.74A2 2 0 0 0 17.06 6H6.94zM6 13l1.5-4h9L18 13H6z"
+      fill={PRIMARY}/>
+    <circle cx="7.5" cy="16.5" r="1.5" fill={PRIMARY}/>
+    <circle cx="16.5" cy="16.5" r="1.5" fill={PRIMARY}/>
+    <rect x="2" y="10" width="3" height="1.5" rx="0.75" fill={PRIMARY} opacity="0.4"/>
+    <rect x="19" y="10" width="3" height="1.5" rx="0.75" fill={PRIMARY} opacity="0.4"/>
+  </svg>
 );
 
 const IcoKI = () => (
-  <Icon color={PRIMARY}>
-    <path d="M12 2a5 5 0 0 1 5 5c0 1.5-.6 2.8-1.5 3.8A4 4 0 0 1 16 14v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2a4 4 0 0 1 .5-3.2A5 5 0 0 1 12 2z" strokeWidth="1.6"/>
-    <line x1="9" y1="21" x2="15" y2="21"/>
-    <line x1="12" y1="18" x2="12" y2="21"/>
-    <circle cx="9.5" cy="9.5" r="1" fill={PRIMARY} stroke="none"/>
-    <circle cx="14.5" cy="9.5" r="1" fill={PRIMARY} stroke="none"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2l1.09 3.41L17 5l-2.73 2 1.09 3.41L12 8.5l-3.36 1.91L9.73 7 7 5l3.91.59L12 2z" fill="#7C3AED"/>
+    <path d="M5 13l.73 2.27L8 16l-2.27.73L5 19l-.73-2.27L2 16l2.27-.73L5 13z" fill="#7C3AED" opacity="0.7"/>
+    <path d="M19 13l.73 2.27L22 16l-2.27.73L19 19l-.73-2.27L16 16l2.27-.73L19 13z" fill="#7C3AED" opacity="0.5"/>
+    <path d="M12 13a4 4 0 0 0-4 4v1h8v-1a4 4 0 0 0-4-4z" fill="#7C3AED" opacity="0.3"/>
+  </svg>
 );
 
 const IcoBeleg = () => (
-  <Icon color={PRIMARY}>
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="9" y1="13" x2="15" y2="13"/>
-    <line x1="9" y1="17" x2="13" y2="17"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M6 2h9l3 3v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="#0D9488" opacity="0.15"/>
+    <path d="M6 2h9l3 3v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="#0D9488" strokeWidth="1.5" fill="none"/>
+    <path d="M14 2v4h4" stroke="#0D9488" strokeWidth="1.5" fill="none"/>
+    <rect x="7" y="10" width="6" height="1.5" rx="0.75" fill="#0D9488"/>
+    <rect x="7" y="13" width="10" height="1.5" rx="0.75" fill="#0D9488"/>
+    <rect x="7" y="16" width="8" height="1.5" rx="0.75" fill="#0D9488" opacity="0.5"/>
+  </svg>
 );
 
 const IcoSimulation = () => (
-  <Icon color={PRIMARY}>
-    <rect x="4" y="2" width="16" height="20" rx="2"/>
-    <line x1="8" y1="8" x2="16" y2="8"/>
-    <line x1="8" y1="12" x2="16" y2="12"/>
-    <line x1="8" y1="16" x2="12" y2="16"/>
-    <line x1="16" y1="16" x2="16" y2="20" strokeDasharray="2 1"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    {/* Sliders icon — modern */}
+    <rect x="2" y="5.5" width="20" height="2" rx="1" fill="#4F46E5" opacity="0.3"/>
+    <rect x="2" y="11.5" width="20" height="2" rx="1" fill="#4F46E5" opacity="0.3"/>
+    <rect x="2" y="17.5" width="20" height="2" rx="1" fill="#4F46E5" opacity="0.3"/>
+    <circle cx="7" cy="6.5" r="3" fill="#4F46E5"/>
+    <circle cx="17" cy="12.5" r="3" fill="#4F46E5"/>
+    <circle cx="10" cy="18.5" r="3" fill="#4F46E5"/>
+  </svg>
 );
 
 const IcoPrognose = () => (
-  <Icon color={PRIMARY}>
-    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-    <polyline points="16 7 22 7 22 13"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M3 18l5-5 4 4 5-6 4-2" stroke={PRIMARY} strokeWidth="0" fill="none"/>
+    {/* Filled bar chart with trend */}
+    <rect x="3" y="14" width="3.5" height="6" rx="1.5" fill={PRIMARY} opacity="0.4"/>
+    <rect x="8" y="10" width="3.5" height="10" rx="1.5" fill={PRIMARY} opacity="0.6"/>
+    <rect x="13" y="6" width="3.5" height="14" rx="1.5" fill={PRIMARY} opacity="0.8"/>
+    <rect x="18" y="2" width="3.5" height="18" rx="1.5" fill={PRIMARY}/>
+    {/* Trend arrow */}
+    <path d="M4 13l14-9" stroke={PRIMARY} strokeWidth="1.8" strokeLinecap="round"/>
+    <path d="M15 4h3v3" stroke={PRIMARY} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </svg>
 );
 
 const IcoExport = () => (
-  <Icon color={PRIMARY}>
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="17 8 12 3 7 8"/>
-    <line x1="12" y1="3" x2="12" y2="15"/>
-  </Icon>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    {/* Share / upload tray — filled */}
+    <rect x="3" y="14" width="18" height="7" rx="2" fill="#0284C7" opacity="0.2"/>
+    <rect x="3" y="18" width="18" height="3" rx="1.5" fill="#0284C7" opacity="0.5"/>
+    <path d="M12 3v10M8.5 7.5L12 3l3.5 4.5" stroke="#0284C7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <rect x="2" y="19" width="20" height="3" rx="1.5" fill="#0284C7"/>
+  </svg>
 );
 
 const IcoCarStat = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 17H3a2 2 0 0 1-2-2v-5l2-4h12l2 4v5a2 2 0 0 1-2 2H5z" strokeWidth="1.8"/>
-    <circle cx="6.5" cy="17" r="1.5"/>
-    <circle cx="15.5" cy="17" r="1.5"/>
-    <path d="M3 11h16"/>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path fillRule="evenodd" clipRule="evenodd"
+      d="M6.94 6a2 2 0 0 0-1.86 1.26L3 13v5a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-5l-2.08-5.74A2 2 0 0 0 17.06 6H6.94zM6 13l1.5-4h9L18 13H6z"
+      fill={PRIMARY}/>
+    <circle cx="7.5" cy="16.5" r="1.5" fill={PRIMARY}/>
+    <circle cx="16.5" cy="16.5" r="1.5" fill={PRIMARY}/>
   </svg>
 );
 
 const IcoTrendUp = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-    <polyline points="17 6 23 6 23 12"/>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M3 17l5-5 4 4 9-10" stroke={PRIMARY} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M15 6h5v5" stroke={PRIMARY} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 const ACTIONS = [
-  { label: "Einnahme", Icon: IcoEinnahme,   bg: "#DCFCE7" },
-  { label: "Ausgabe",  Icon: IcoAusgabe,    bg: "#FEF3C7" },
-  { label: "Fahrt",    Icon: IcoFahrt,      bg: "#EBF5FF" },
-  { label: "KI",       Icon: IcoKI,         bg: "#EBF5FF" },
-  { label: "Beleg",    Icon: IcoBeleg,      bg: "#EBF5FF" },
-  { label: "Simulation", Icon: IcoSimulation, bg: "#EBF5FF" },
-  { label: "Prognose", Icon: IcoPrognose,   bg: "#EBF5FF" },
-  { label: "Export",   Icon: IcoExport,     bg: "#EBF5FF" },
+  { label: "Einnahme",   Icon: IcoEinnahme,   bg: "#DCFCE7" },
+  { label: "Ausgabe",    Icon: IcoAusgabe,    bg: "#FEF3C7" },
+  { label: "Fahrt",      Icon: IcoFahrt,      bg: "#DBEAFE" },
+  { label: "KI",         Icon: IcoKI,         bg: "#EDE9FE" },
+  { label: "Beleg",      Icon: IcoBeleg,      bg: "#CCFBF1" },
+  { label: "Simulation", Icon: IcoSimulation, bg: "#E0E7FF" },
+  { label: "Prognose",   Icon: IcoPrognose,   bg: "#DBEAFE" },
+  { label: "Export",     Icon: IcoExport,     bg: "#E0F2FE" },
 ];
 
 export function VariantC() {
@@ -148,7 +164,7 @@ export function VariantC() {
           </div>
         </div>
 
-        {/* Slim progress banner */}
+        {/* Progress banner */}
         <div style={{ margin: "0 16px", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "12px 16px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: MUTED, fontFamily: "Inter, sans-serif", fontWeight: 500 }}>§ 19 UStG Jahresgrenze</span>
@@ -163,7 +179,7 @@ export function VariantC() {
           </div>
         </div>
 
-        {/* Large balance card */}
+        {/* Balance card */}
         <div style={{ margin: "10px 16px 0", borderRadius: 20, padding: 22, background: `linear-gradient(135deg, ${PRIMARY} 0%, #004A8F 100%)`, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: -40, right: -40, width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }}/>
           <div style={{ position: "absolute", bottom: -30, left: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,0.04)" }}/>
@@ -183,7 +199,7 @@ export function VariantC() {
           </div>
         </div>
 
-        {/* 2 stat cards */}
+        {/* Stat cards */}
         <div style={{ display: "flex", gap: 10, padding: "10px 16px 0" }}>
           {[
             { label: "Fahrtkosten", value: fmtEur(287), sub: "956 km · 0,30 €/km", Icon: IcoCarStat },
@@ -198,28 +214,28 @@ export function VariantC() {
           ))}
         </div>
 
-        {/* 4-column semantic icon action grid */}
+        {/* Quick action grid */}
         <div style={{ padding: "14px 16px 0" }}>
           <div style={{ fontSize: 13, color: FOREGROUND, fontFamily: "Inter, sans-serif", fontWeight: 700, marginBottom: 10 }}>Schnellaktionen</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
             {ACTIONS.map((a, i) => (
               <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "14px 4px 10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7, cursor: "pointer" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 14, background: a.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 42, height: 42, borderRadius: 14, background: a.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <a.Icon />
                 </div>
-                <span style={{ fontSize: 10, color: FOREGROUND, fontFamily: "Inter, sans-serif", fontWeight: 500, textAlign: "center" }}>{a.label}</span>
+                <span style={{ fontSize: 10, color: FOREGROUND, fontFamily: "Inter, sans-serif", fontWeight: 600, textAlign: "center" }}>{a.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Tax tip teaser */}
+        {/* Tax tip */}
         <div style={{ margin: "12px 16px 0", background: "#EBF5FF", border: `1px solid #BFDBFE`, borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2a7 7 0 0 1 7 7c0 2.4-1.2 4.5-3 5.7V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.3A7 7 0 0 1 5 9a7 7 0 0 1 7-7z"/>
-              <line x1="9" y1="21" x2="15" y2="21"/>
-              <line x1="10" y1="18" x2="14" y2="18"/>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+              <path d="M12 2a7 7 0 0 1 5.4 11.47l.6 2.53-2.5-.83A7 7 0 1 1 12 2zm0 2a5 5 0 1 0 2.77 9.19l1.83.6-.44-1.85A5 5 0 0 0 12 4z" fill="#fff" opacity="0.9"/>
+              <rect x="11" y="9" width="2" height="5" rx="1" fill="#fff"/>
+              <circle cx="12" cy="16" r="1" fill="#fff"/>
             </svg>
           </div>
           <div>
