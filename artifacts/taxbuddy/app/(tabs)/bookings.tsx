@@ -81,6 +81,11 @@ export default function BookingsScreen() {
     else router.push("/trip/new");
   };
 
+  const onImportPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push("/trip/import");
+  };
+
   const renderItem = ({ item }: { item: Income | Expense | Trip }) => {
     if (tab === "income") {
       const i = item as Income;
@@ -364,6 +369,27 @@ export default function BookingsScreen() {
           </View>
         }
       />
+
+      {/* Import button — only visible on Fahrten tab */}
+      {tab === "trip" && (
+        <Pressable
+          onPress={onImportPress}
+          style={({ pressed }) => [
+            styles.fab,
+            {
+              backgroundColor: colors.card,
+              borderWidth: 1.5,
+              borderColor: colors.primary,
+              bottom: (Platform.OS === "web" ? 168 : insets.bottom + 158),
+              right: 20,
+              opacity: pressed ? 0.85 : 1,
+              transform: [{ scale: pressed ? 0.95 : 1 }],
+            },
+          ]}
+        >
+          <Feather name="upload" size={22} color={colors.primary} />
+        </Pressable>
+      )}
 
       <Pressable
         onPress={onAddPress}
