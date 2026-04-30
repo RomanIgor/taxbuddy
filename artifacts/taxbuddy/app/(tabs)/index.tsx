@@ -25,7 +25,6 @@ import { useExpenses } from "@/contexts/ExpensesContext";
 import { useTrips } from "@/contexts/TripsContext";
 import { formatCurrency } from "@/utils/format";
 import { LEGAL } from "@/constants/legal";
-import { TAXbuddyLogo } from "@/components/TAXbuddyLogo";
 
 type QuickAction = {
   key: string;
@@ -114,10 +113,6 @@ export default function DashboardScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.logoRow}>
-        <TAXbuddyLogo size="sm" />
-      </View>
-
       <View style={styles.greetingRow}>
         <View style={{ flex: 1 }}>
           <Text style={[styles.greetingHello, { color: colors.mutedForeground }]}>
@@ -360,15 +355,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 18,
   },
-  logoRow: {
-    alignItems: "flex-start",
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
   greetingRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 4,
+    paddingTop: 12,
   },
   greetingHello: {
     fontSize: 13,

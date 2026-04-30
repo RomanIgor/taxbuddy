@@ -9,6 +9,7 @@ import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
 import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/contexts/ProfileContext";
+import { TAXbuddyLogo } from "@/components/TAXbuddyLogo";
 
 function NativeTabLayout() {
   return (
@@ -79,6 +80,7 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: "Dashboard",
+          headerTitle: () => <TAXbuddyLogo size="md" />,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={24} />
