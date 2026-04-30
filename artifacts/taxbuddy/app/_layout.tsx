@@ -39,6 +39,7 @@ function RootLayoutNav() {
       <Stack.Screen name="expense/[id]" options={{ title: "Ausgabe Details" }} />
       <Stack.Screen name="trip/new" options={{ title: "Fahrt erfassen" }} />
       <Stack.Screen name="trip/[id]" options={{ title: "Fahrt Details" }} />
+      <Stack.Screen name="trip/import" options={{ headerShown: false }} />
       <Stack.Screen name="tip/[id]" options={{ title: "Steuer-Tipp" }} />
       <Stack.Screen name="ai" options={{ title: "KI-Assistent", presentation: "modal" }} />
       <Stack.Screen name="invoice-check" options={{ title: "Rechnungs-Check" }} />
