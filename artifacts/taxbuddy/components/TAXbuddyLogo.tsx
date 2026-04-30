@@ -4,7 +4,9 @@ import { View, Text, Image, StyleSheet } from "react-native";
 const BRAND_NAVY  = "#0F2B4C";
 const BRAND_GREEN = "#3DB54A";
 
-const raccoonAsset = require("@/assets/images/raccoon_mascot.png");
+const raccoonCircle = require("@/assets/images/raccoon_logo_circle.jpeg");
+const raccoonThumbs = require("@/assets/images/raccoon_suit_thumbs.jpeg");
+const raccoonBadge  = require("@/assets/images/raccoon_suit_badge.jpeg");
 
 type Props = {
   size?: "sm" | "md" | "lg" | "xl";
@@ -21,29 +23,14 @@ const SIZES = {
 };
 
 function RaccoonHead({ diameter }: { diameter: number }) {
-  const scale = diameter / 305;
-  const imgW   = Math.round(1024 * scale);
-  const imgH   = Math.round(1024 * scale);
-  const left   = Math.round(-80 * scale);
-  const top    = Math.round(-10 * scale);
-
   return (
-    <View style={{ width: diameter, height: diameter, overflow: "hidden", borderRadius: diameter / 2 }}>
-      <Image
-        source={raccoonAsset}
-        style={{ position: "absolute", width: imgW, height: imgH, left, top }}
-        resizeMode="stretch"
-      />
+    <View style={{ width: diameter, height: diameter, overflow: "hidden", borderRadius: diameter / 2, backgroundColor: "#fff" }}>
+      <Image source={raccoonCircle} style={{ width: diameter, height: diameter }} resizeMode="cover" />
     </View>
   );
 }
 
-export function TAXbuddyLogo({
-  size = "md",
-  showTagline = false,
-  lightMode = false,
-  showMascot = false,
-}: Props) {
+export function TAXbuddyLogo({ size = "md", showTagline = false, lightMode = false, showMascot = false }: Props) {
   const s = SIZES[size];
   const navyColor = lightMode ? "#FFFFFF" : BRAND_NAVY;
 
@@ -56,39 +43,17 @@ export function TAXbuddyLogo({
           </View>
         )}
         <View style={styles.wordmark}>
-          <Text
-            numberOfLines={1}
-            style={[
-              styles.tax,
-              { fontSize: s.tax, color: navyColor, letterSpacing: s.letterSpacing },
-            ]}
-          >
+          <Text numberOfLines={1} style={[styles.tax, { fontSize: s.tax, color: navyColor, letterSpacing: s.letterSpacing }]}>
             TAX
           </Text>
-          <Text
-            numberOfLines={1}
-            style={[
-              styles.buddy,
-              {
-                fontSize: s.buddy,
-                color: BRAND_GREEN,
-                letterSpacing: s.letterSpacing,
-                paddingRight: Math.abs(s.letterSpacing) + 2,
-              },
-            ]}
-          >
+          <Text numberOfLines={1} style={[styles.buddy, { fontSize: s.buddy, color: BRAND_GREEN, letterSpacing: s.letterSpacing, paddingRight: Math.abs(s.letterSpacing) + 2 }]}>
             buddy
           </Text>
         </View>
       </View>
       {showTagline && (
-        <Text
-          style={[
-            styles.tagline,
-            { fontSize: s.tagline, color: lightMode ? "rgba(255,255,255,0.7)" : "#64748B" },
-          ]}
-        >
-          STEUERN IM BLICK. ZUKUNFT IM GRIFF.
+        <Text style={[styles.tagline, { fontSize: s.tagline, color: lightMode ? "rgba(255,255,255,0.7)" : "#64748B" }]}>
+          CLEVER. ENTSPANNT. STEUERN IM GRIFF.
         </Text>
       )}
     </View>
@@ -96,45 +61,26 @@ export function TAXbuddyLogo({
 }
 
 export function RaccoonHero({ width, height }: { width: number; height: number }) {
-  const scale  = width / 440;
-  const imgW   = Math.round(1024 * scale);
-  const imgH   = Math.round(1024 * scale);
+  return <Image source={raccoonThumbs} style={{ width, height }} resizeMode="contain" />;
+}
 
+export function RaccoonBadgeFull({ width, height }: { width: number; height: number }) {
+  return <Image source={raccoonBadge} style={{ width, height }} resizeMode="contain" />;
+}
+
+export function RaccoonCircle({ size }: { size: number }) {
   return (
-    <View style={{ width, height, overflow: "hidden" }}>
-      <Image
-        source={raccoonAsset}
-        style={{ width: imgW, height: imgH, left: 0, top: 0 }}
-        resizeMode="stretch"
-      />
+    <View style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", backgroundColor: "#fff" }}>
+      <Image source={raccoonCircle} style={{ width: size, height: size }} resizeMode="cover" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    gap: 4,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  wordmark: {
-    flexDirection: "row",
-    alignItems: "baseline",
-  },
-  tax: {
-    fontFamily: "Inter_800ExtraBold",
-    includeFontPadding: false,
-  },
-  buddy: {
-    fontFamily: "Inter_400Regular",
-    includeFontPadding: false,
-  },
-  tagline: {
-    fontFamily: "Inter_500Medium",
-    letterSpacing: 1.2,
-    textAlign: "center",
-  },
+  container: { alignItems: "center", gap: 4 },
+  row:       { flexDirection: "row", alignItems: "center" },
+  wordmark:  { flexDirection: "row", alignItems: "baseline" },
+  tax:       { fontFamily: "Inter_800ExtraBold", includeFontPadding: false },
+  buddy:     { fontFamily: "Inter_400Regular", includeFontPadding: false },
+  tagline:   { fontFamily: "Inter_500Medium", letterSpacing: 1.2, textAlign: "center" },
 });

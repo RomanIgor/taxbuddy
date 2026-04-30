@@ -12,7 +12,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import raccoon from "@/assets/raccoon_mascot.png";
+import raccoonLogo from "@/assets/raccoon_logo_circle.jpeg";
 
 const navMain = [
   { href: "/",              label: "Übersicht",    icon: LayoutDashboard },
@@ -38,29 +38,22 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-border flex flex-col z-20">
       {/* Logo */}
-      <div className="h-20 flex items-center px-5 border-b border-sidebar-border">
-        <Link href="/" className="flex items-center gap-3 select-none">
-          {/* Raccoon logo: white pill badge so the mascot is visible on dark sidebar */}
+      <div className="h-20 flex items-center px-4 border-b border-sidebar-border">
+        <Link href="/" className="flex items-center gap-2.5 select-none">
           <div
-            className="flex-shrink-0 rounded-2xl flex items-center justify-center"
-            style={{ width: 60, height: 60, background: "rgba(255,255,255,0.12)" }}
+            className="flex-shrink-0 rounded-2xl overflow-hidden bg-white"
+            style={{ width: 56, height: 56 }}
           >
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                backgroundImage: `url(${raccoon})`,
-                backgroundSize: "200%",
-                backgroundPosition: "50% 8%",
-                backgroundRepeat: "no-repeat",
-              }}
-              role="img"
-              aria-label="TAXbuddy Waschbär"
+            <img
+              src={raccoonLogo}
+              alt="TAXbuddy"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
             />
           </div>
           <div className="leading-none">
             <div className="text-xl font-extrabold tracking-tight text-white">TAX</div>
             <div className="text-xl font-bold tracking-tight text-[#3DB54A]">buddy</div>
+            <div className="text-[9px] font-medium tracking-widest text-white/50 mt-0.5">STEUERN IM GRIFF</div>
           </div>
         </Link>
       </div>
