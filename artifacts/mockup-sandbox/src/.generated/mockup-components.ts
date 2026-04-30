@@ -6,5 +6,8 @@ export const modules: ModuleMap = {
   "./components/mockups/taxbuddy-dashboard/UsabilityC.tsx": () => import("../components/mockups/taxbuddy-dashboard/UsabilityC.tsx"),
   "./components/mockups/taxbuddy-dashboard/VariantA.tsx": () => import("../components/mockups/taxbuddy-dashboard/VariantA.tsx"),
   "./components/mockups/taxbuddy-dashboard/VariantB.tsx": () => import("../components/mockups/taxbuddy-dashboard/VariantB.tsx"),
-  "./components/mockups/taxbuddy-dashboard/VariantC.tsx": () => import("../components/mockups/taxbuddy-dashboard/VariantC.tsx")
+  "./components/mockups/taxbuddy-dashboard/VariantC.tsx": () => import("../components/mockups/taxbuddy-dashboard/VariantC.tsx"),
+  "./components/mockups/taxbuddy-dashboard/VibeDark.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeDark.tsx"),
+  "./components/mockups/taxbuddy-dashboard/VibeQuiet.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeQuiet.tsx"),
+  "./components/mockups/taxbuddy-dashboard/VibeWarm.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeWarm.tsx")
 };
