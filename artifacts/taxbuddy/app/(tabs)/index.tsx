@@ -141,13 +141,6 @@ export default function DashboardScreen() {
           <Text style={[styles.greetingName, { color: colors.foreground }]}>
             {profile?.name ?? "TAXbuddy"}
           </Text>
-          <Pressable
-            onPress={() => { Haptics.selectionAsync(); router.push("/profile"); }}
-            style={({ pressed }) => [styles.editLink, { opacity: pressed ? 0.6 : 1 }]}
-            accessibilityLabel="Profil bearbeiten"
-          >
-            <Text style={[styles.editLinkText, { color: "#0066B3" }]}>Bearbeiten</Text>
-          </Pressable>
         </View>
         <Pressable
           accessibilityLabel="Profil"
@@ -302,7 +295,7 @@ const styles = StyleSheet.create({
   /* greeting */
   greetingRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     paddingTop: 12,
   },
   greetingHello: {
@@ -314,15 +307,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "Inter_700Bold",
     marginTop: 2,
-  },
-  editLink: {
-    alignSelf: "flex-start",
-    marginTop: 4,
-    paddingVertical: 2,
-  },
-  editLinkText: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
   },
   headerBtn: {
     width: 40,

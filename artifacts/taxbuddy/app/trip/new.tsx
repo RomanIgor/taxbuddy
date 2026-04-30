@@ -8,7 +8,7 @@ import {
   Switch,
   Platform,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -21,37 +21,54 @@ import { formatCurrency } from "@/utils/format";
 export default function TripNewScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { addTrip } = useTrips();
+  const { addTrip, updateTrip, trips } = useTrips();
+  const { editId } = useLocalSearchParams<{ editId?: string }>();
 
-  const [client, setClient] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [km, setKm] = useState("");
-  const [roundTrip, setRoundTrip] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const existing = editId ? trips.find((t) => t.id === editId) : undefined;
+  const isEdit = !!existing;
 
-  const kmNum = parseFloat(km.replace(",", "."));
-  const totalKm = !isNaN(kmNum) ? kmNum * (roundTrip ? 2 : 1) : 0;
-  const pauschale = totalKm * LEGAL.kilometerpauschale;
+  const [client, setClient]     = useState(existing?.client ?? "");
+  const [purpose, setPurpose]   = useState(existing?.purpose ?? "");
+  const [from, setFrom]         = useState(existing?.from ?? "");
+  const [to, setTo]             = useState(existing?.to ?? "");
+  const [km, setKm]             = useState(existing ? String(existing.km) : "");
+  const [roundTrip, setRoundTrip] = useState(existing?.roundTrip ?? true);
+  const [error, setError]       = useState<string | null>(null);
+
+  const kmNum      = parseFloat(km.replace(",", "."));
+  const totalKm    = !isNaN(kmNum) ? kmNum * (roundTrip ? 2 : 1) : 0;
+  const pauschale  = totalKm * LEGAL.kilometerpauschale;
 
   const handleSave = async () => {
-    if (!client.trim()) return setError("Bitte einen Kunden eingeben.");
-    if (!purpose.trim()) return setError("Bitte einen Zweck eingeben.");
-    if (isNaN(kmNum) || kmNum <= 0)
-      return setError("Bitte gefahrene Kilometer eingeben.");
+    if (!client.trim())                  return setError("Bitte einen Kunden eingeben.");
+    if (!purpose.trim())                 return setError("Bitte einen Zweck eingeben.");
+    if (isNaN(kmNum) || kmNum <= 0)      return setError("Bitte gefahrene Kilometer eingeben.");
 
     setError(null);
-    await addTrip({
-      date: new Date().toISOString(),
-      client: client.trim(),
-      purpose: purpose.trim(),
-      from: from.trim(),
-      to: to.trim(),
-      km: kmNum,
-      roundTrip,
-      pauschale,
-    });
+
+    if (isEdit && existing) {
+      await updateTrip(existing.id, {
+        client: client.trim(),
+        purpose: purpose.trim(),
+        from: from.trim(),
+        to: to.trim(),
+        km: kmNum,
+        roundTrip,
+        pauschale,
+      });
+    } else {
+      await addTrip({
+        date: new Date().toISOString(),
+        client: client.trim(),
+        purpose: purpose.trim(),
+        from: from.trim(),
+        to: to.trim(),
+        km: kmNum,
+        roundTrip,
+        pauschale,
+      });
+    }
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     router.back();
   };
@@ -65,10 +82,7 @@ export default function TripNewScreen() {
         <View
           style={[
             styles.previewCard,
-            {
-              backgroundColor: colors.primary,
-              borderRadius: colors.radius,
-            },
+            { backgroundColor: colors.primary, borderRadius: colors.radius },
           ]}
         >
           <Text style={styles.previewLabel}>Pauschale (0,30 €/km)</Text>
@@ -85,14 +99,7 @@ export default function TripNewScreen() {
             onChangeText={setClient}
             placeholder="z. B. Acme GmbH"
             placeholderTextColor={colors.mutedForeground}
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                color: colors.foreground,
-              },
-            ]}
+            style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
           />
         </Field>
 
@@ -102,14 +109,7 @@ export default function TripNewScreen() {
             onChangeText={setPurpose}
             placeholder="z. B. Projektbesprechung"
             placeholderTextColor={colors.mutedForeground}
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                color: colors.foreground,
-              },
-            ]}
+            style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
           />
         </Field>
 
@@ -121,14 +121,7 @@ export default function TripNewScreen() {
                 onChangeText={setFrom}
                 placeholder="Büro"
                 placeholderTextColor={colors.mutedForeground}
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                    color: colors.foreground,
-                  },
-                ]}
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
               />
             </Field>
           </View>
@@ -139,14 +132,7 @@ export default function TripNewScreen() {
                 onChangeText={setTo}
                 placeholder="Kunde"
                 placeholderTextColor={colors.mutedForeground}
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: colors.card,
-                    borderColor: colors.border,
-                    color: colors.foreground,
-                  },
-                ]}
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
               />
             </Field>
           </View>
@@ -159,64 +145,34 @@ export default function TripNewScreen() {
             keyboardType="decimal-pad"
             placeholder="0"
             placeholderTextColor={colors.mutedForeground}
-            style={[
-              styles.input,
-              styles.inputBig,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                color: colors.foreground,
-              },
-            ]}
+            style={[styles.input, styles.inputBig, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
           />
         </Field>
 
         <View
           style={[
             styles.toggleCard,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderRadius: colors.radius,
-            },
+            { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius },
           ]}
         >
           <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                color: colors.foreground,
-                fontFamily: "Inter_600SemiBold",
-                fontSize: 15,
-              }}
-            >
+            <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 15 }}>
               Hin- und Rückfahrt
             </Text>
-            <Text
-              style={{
-                color: colors.mutedForeground,
-                fontFamily: "Inter_500Medium",
-                fontSize: 12,
-                marginTop: 2,
-              }}
-            >
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12, marginTop: 2 }}>
               Verdoppelt die Kilometer für die Pauschale
             </Text>
           </View>
           <Switch
             value={roundTrip}
-            onValueChange={(v) => {
-              Haptics.selectionAsync();
-              setRoundTrip(v);
-            }}
+            onValueChange={(v) => { Haptics.selectionAsync(); setRoundTrip(v); }}
             trackColor={{ true: colors.primary, false: colors.border }}
             thumbColor="#ffffff"
           />
         </View>
 
         {error ? (
-          <Text style={{ color: colors.critical, fontFamily: "Inter_500Medium" }}>
-            {error}
-          </Text>
+          <Text style={{ color: colors.critical, fontFamily: "Inter_500Medium" }}>{error}</Text>
         ) : null}
       </KeyboardAwareScrollViewCompat>
 
@@ -234,21 +190,11 @@ export default function TripNewScreen() {
           onPress={handleSave}
           style={({ pressed }) => [
             styles.cta,
-            {
-              backgroundColor: colors.primary,
-              borderRadius: colors.radius,
-              opacity: pressed ? 0.85 : 1,
-            },
+            { backgroundColor: colors.primary, borderRadius: colors.radius, opacity: pressed ? 0.85 : 1 },
           ]}
         >
-          <Text
-            style={{
-              color: colors.primaryForeground,
-              fontFamily: "Inter_600SemiBold",
-              fontSize: 16,
-            }}
-          >
-            Fahrt speichern
+          <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold", fontSize: 16 }}>
+            {isEdit ? "Änderungen speichern" : "Fahrt speichern"}
           </Text>
         </Pressable>
       </View>
@@ -256,95 +202,27 @@ export default function TripNewScreen() {
   );
 }
 
-function Field({
-  label,
-  children,
-  colors,
-}: {
-  label: string;
-  children: React.ReactNode;
-  colors: any;
-}) {
+function Field({ label, children, colors }: { label: string; children: React.ReactNode; colors: any }) {
   return (
     <View style={styles.field}>
-      <Text
-        style={[
-          styles.label,
-          {
-            color: colors.foreground,
-          },
-        ]}
-      >
-        {label}
-      </Text>
+      <Text style={[styles.label, { color: colors.foreground }]}>{label}</Text>
       {children}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scroll: {
-    paddingHorizontal: 20,
-    gap: 16,
-    paddingBottom: 140,
-  },
-  previewCard: {
-    padding: 18,
-    gap: 4,
-  },
-  previewLabel: {
-    color: "#cfe6ff",
-    fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-  },
-  previewAmount: {
-    color: "#ffffff",
-    fontSize: 32,
-    fontFamily: "Inter_700Bold",
-  },
-  previewSub: {
-    color: "#cfe6ff",
-    fontSize: 13,
-    fontFamily: "Inter_500Medium",
-  },
-  field: { gap: 8 },
-  label: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    fontSize: 15,
-    fontFamily: "Inter_500Medium",
-  },
-  inputBig: {
-    height: 60,
-    fontSize: 24,
-    fontFamily: "Inter_700Bold",
-  },
-  toggleCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
-    borderWidth: 1,
-    gap: 12,
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    borderTopWidth: 1,
-  },
-  cta: {
-    height: 54,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container:    { flex: 1 },
+  scroll:       { paddingHorizontal: 20, gap: 16, paddingBottom: 140 },
+  previewCard:  { padding: 18, gap: 4 },
+  previewLabel: { color: "#cfe6ff", fontSize: 12, fontFamily: "Inter_600SemiBold", textTransform: "uppercase", letterSpacing: 0.4 },
+  previewAmount:{ color: "#ffffff", fontSize: 32, fontFamily: "Inter_700Bold" },
+  previewSub:   { color: "#cfe6ff", fontSize: 13, fontFamily: "Inter_500Medium" },
+  field:        { gap: 8 },
+  label:        { fontSize: 13, fontFamily: "Inter_600SemiBold", textTransform: "uppercase", letterSpacing: 0.4 },
+  input:        { height: 50, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, fontSize: 15, fontFamily: "Inter_500Medium" },
+  inputBig:     { height: 60, fontSize: 24, fontFamily: "Inter_700Bold" },
+  toggleCard:   { flexDirection: "row", alignItems: "center", padding: 14, borderWidth: 1, gap: 12 },
+  footer:       { paddingHorizontal: 20, paddingTop: 12, borderTopWidth: 1 },
+  cta:          { height: 54, alignItems: "center", justifyContent: "center" },
 });

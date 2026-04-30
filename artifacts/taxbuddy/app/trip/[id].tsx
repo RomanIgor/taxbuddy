@@ -105,6 +105,26 @@ export default function TripDetailScreen() {
       </View>
 
       <Pressable
+        onPress={() => {
+          Haptics.selectionAsync();
+          router.push(`/trip/new?editId=${item.id}`);
+        }}
+        style={({ pressed }) => [
+          styles.cta,
+          {
+            backgroundColor: "#0066B3",
+            borderRadius: colors.radius,
+            opacity: pressed ? 0.85 : 1,
+          },
+        ]}
+      >
+        <Feather name="edit-2" size={18} color="#ffffff" />
+        <Text style={{ color: "#ffffff", fontFamily: "Inter_600SemiBold", fontSize: 15 }}>
+          Bearbeiten
+        </Text>
+      </Pressable>
+
+      <Pressable
         onPress={handleDelete}
         style={({ pressed }) => [
           styles.cta,
@@ -118,13 +138,7 @@ export default function TripDetailScreen() {
         ]}
       >
         <Feather name="trash-2" size={18} color={colors.critical} />
-        <Text
-          style={{
-            color: colors.critical,
-            fontFamily: "Inter_600SemiBold",
-            fontSize: 15,
-          }}
-        >
+        <Text style={{ color: colors.critical, fontFamily: "Inter_600SemiBold", fontSize: 15 }}>
           Löschen
         </Text>
       </Pressable>
