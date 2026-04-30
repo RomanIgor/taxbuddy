@@ -9,5 +9,8 @@ export const modules: ModuleMap = {
   "./components/mockups/taxbuddy-dashboard/VariantC.tsx": () => import("../components/mockups/taxbuddy-dashboard/VariantC.tsx"),
   "./components/mockups/taxbuddy-dashboard/VibeDark.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeDark.tsx"),
   "./components/mockups/taxbuddy-dashboard/VibeQuiet.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeQuiet.tsx"),
-  "./components/mockups/taxbuddy-dashboard/VibeWarm.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeWarm.tsx")
+  "./components/mockups/taxbuddy-dashboard/VibeWarm.tsx": () => import("../components/mockups/taxbuddy-dashboard/VibeWarm.tsx"),
+  "./components/mockups/onboarding-arc/DataDrama.tsx": () => import("../components/mockups/onboarding-arc/DataDrama.tsx"),
+  "./components/mockups/onboarding-arc/GiantType.tsx": () => import("../components/mockups/onboarding-arc/GiantType.tsx"),
+  "./components/mockups/onboarding-arc/RaccoonSpeaks.tsx": () => import("../components/mockups/onboarding-arc/RaccoonSpeaks.tsx")
 };
