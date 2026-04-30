@@ -38,19 +38,29 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-border flex flex-col z-20">
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-sidebar-border">
+      <div className="h-20 flex items-center px-5 border-b border-sidebar-border">
         <Link href="/" className="flex items-center gap-3 select-none">
-          <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
-            <img
-              src={raccoon}
-              alt="TAXbuddy Waschbär"
-              className="w-full h-full object-contain"
-              style={{ imageRendering: "auto" }}
+          {/* Raccoon logo: white pill badge so the mascot is visible on dark sidebar */}
+          <div
+            className="flex-shrink-0 rounded-2xl flex items-center justify-center"
+            style={{ width: 60, height: 60, background: "rgba(255,255,255,0.12)" }}
+          >
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                backgroundImage: `url(${raccoon})`,
+                backgroundSize: "200%",
+                backgroundPosition: "50% 8%",
+                backgroundRepeat: "no-repeat",
+              }}
+              role="img"
+              aria-label="TAXbuddy Waschbär"
             />
           </div>
           <div className="leading-none">
-            <span className="text-xl font-extrabold tracking-tight text-white">TAX</span>
-            <span className="text-xl font-bold tracking-tight text-[#3DB54A]">buddy</span>
+            <div className="text-xl font-extrabold tracking-tight text-white">TAX</div>
+            <div className="text-xl font-bold tracking-tight text-[#3DB54A]">buddy</div>
           </div>
         </Link>
       </div>
