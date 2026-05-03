@@ -39,6 +39,7 @@ app.use("/api", router);
 // so two levels up reaches artifacts/taxbuddy-web/dist/public.
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const staticDir = resolve(__dirname, "../../taxbuddy-web/dist/public");
+logger.info({ staticDir, exists: existsSync(staticDir) }, "Static file serving");
 
 if (existsSync(staticDir)) {
   app.use(express.static(staticDir));
