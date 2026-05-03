@@ -1,6 +1,9 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
+import { existsSync } from "fs";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -30,5 +33,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// Serve compiled frontend static files.
+// At runtime the bundled file is at artifacts/api-server/dist/index.mjs,
+// so two levels up reaches artifacts/taxbuddy-web/dist/public.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const staticDir = resolve(__dirname, "../../taxbuddy-web/dist/public");
+
+if (existsSync(staticDir)) {
+  app.use(express.static(staticDir));
+  // SPA fallback: Express 5 does not support app.get("*"), use app.use instead
+  app.use((_req, res) => {
+    res.sendFile(resolve(staticDir, "index.html"));
+  });
+}
 
 export default app;
